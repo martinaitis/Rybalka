@@ -1,16 +1,18 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Models;
 using RybalkaWebAPI.Models.Dto;
 
 namespace RybalkaWebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/note")]
     [ApiController]
     public class FishingNoteApiController : ControllerBase
     {
+        private const string GET_ROUTE_NAME = "GetNotes";
         private readonly ILogger<FishingNoteApiController> _logger;
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
@@ -25,49 +27,31 @@ namespace RybalkaWebAPI.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet()]
+        /// <remarks>
+        /// Use default parameters to get all fishing notes.
+        /// For filtering use only one parameter, parameters can not be combined.
+        /// </remarks>
+        [HttpGet(Name = GET_ROUTE_NAME)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<FishingNoteDto>> GetAllNotes()
+        public ActionResult<IEnumerable<FishingNoteDto>> Get(int id = 0, string user = "")
         {
-            var notes = _db.FishingNotes.AsNoTracking();
-            if (notes.Any())
+            if (id != 0 && !user.IsNullOrEmpty())
             {
-                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+                return BadRequest("Use one filter parameter");
             }
-
-            _logger.LogWarning($"Action: {nameof(GetAllNotes)} Message: Notes table is empty");
-            return NotFound();
-        }
-
-        [HttpGet("id", Name = nameof(GetNoteById))]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<FishingNoteDto>> GetNoteById(int id)
-        {
-            var note = _db.FishingNotes.AsNoTracking().FirstOrDefault(n => n.Id == id);
-            if (note == null)
+            else if (id != 0)
             {
-                _logger.LogWarning($"Action: {nameof(GetNoteById)} Message: note with id:{id} does not exist in DB");
-                return NotFound();
+                return GetNoteById(id);
             }
-
-            return Ok(_mapper.Map<FishingNoteDto>(note));
-        }
-
-        [HttpGet("user")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public ActionResult<IEnumerable<FishingNoteDto>> GetNotesByUser(string user)
-        {
-            var notes = _db.FishingNotes.AsNoTracking().Where(n => n.User == user);
-            if (notes.Any())
+            else if (!user.IsNullOrEmpty())
             {
-                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+                return GetNotesByUser(user);
             }
-
-            _logger.LogWarning($"Action: {nameof(GetNotesByUser)} Message: notes by user:{user} does not exist in DB");
-            return NoContent();
+            else
+            {
+                return GetAllNotes();
+            }
         }
 
         [HttpPost]
@@ -93,11 +77,11 @@ namespace RybalkaWebAPI.Controllers
                 _db.FishingNotes.Add(note);
                 await _db.SaveChangesAsync();
 
-                return CreatedAtRoute(nameof(GetNoteById), new { id = note.Id });
+                return StatusCode(StatusCodes.Status201Created);
             }
         }
 
-        [HttpDelete("id")]
+        [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteNote(int id)
@@ -116,7 +100,7 @@ namespace RybalkaWebAPI.Controllers
             }
         }
 
-        [HttpPut("id")]
+        [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -139,6 +123,42 @@ namespace RybalkaWebAPI.Controllers
             _db.Update(note);
             await _db.SaveChangesAsync();
 
+            return NoContent();
+        }
+
+        private ActionResult<IEnumerable<FishingNoteDto>> GetAllNotes()
+        {
+            var notes = _db.FishingNotes.AsNoTracking();
+            if (notes.Any())
+            {
+                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+            }
+
+            _logger.LogWarning($"Action: {nameof(GetAllNotes)} Message: Notes table is empty");
+            return NotFound();
+        }
+
+        private ActionResult<IEnumerable<FishingNoteDto>> GetNoteById(int id)
+        {
+            var note = _db.FishingNotes.AsNoTracking().FirstOrDefault(n => n.Id == id);
+            if (note == null)
+            {
+                _logger.LogWarning($"Action: {nameof(GetNoteById)} Message: note with id:{id} does not exist in DB");
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<FishingNoteDto>(note));
+        }
+
+        private ActionResult<IEnumerable<FishingNoteDto>> GetNotesByUser(string user)
+        {
+            var notes = _db.FishingNotes.AsNoTracking().Where(n => n.User == user);
+            if (notes.Any())
+            {
+                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+            }
+
+            _logger.LogWarning($"Action: {nameof(GetNotesByUser)} Message: notes by user:{user} does not exist in DB");
             return NoContent();
         }
     }
