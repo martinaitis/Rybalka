@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RybalkaWebAPI.Data;
 
@@ -11,9 +12,11 @@ using RybalkaWebAPI.Data;
 namespace RybalkaWebAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230128165358_Change_FishingMethods_Type_To_Enum")]
+    partial class ChangeFishingMethodsTypeToEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,10 +45,10 @@ namespace RybalkaWebAPI.Migrations
                     b.Property<int?>("FishingMethod")
                         .HasColumnType("int");
 
-                    b.Property<double?>("Latitude")
+                    b.Property<double>("Latitude")
                         .HasColumnType("float");
 
-                    b.Property<double?>("Longitude")
+                    b.Property<double>("Longitude")
                         .HasColumnType("float");
 
                     b.Property<string>("Note")

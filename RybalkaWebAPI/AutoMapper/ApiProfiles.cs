@@ -8,8 +8,12 @@ namespace RybalkaWebAPI.AutoMapper
     {
         public ApiProfiles()
         {
-            CreateMap<FishingNoteDto, FishingNote>();
-            CreateMap<FishingNote, FishingNoteDto>();
+            CreateMap<FishingNoteDto, FishingNote>()
+                .ForPath(dest => dest.Latitude, opt => opt.MapFrom(src => src.Coordinates!.Latitude))
+                .ForPath(dest => dest.Longitude, opt => opt.MapFrom(src => src.Coordinates!.Longitude));
+            CreateMap<FishingNote, FishingNoteDto>()
+                .ForPath(dest => dest.Coordinates!.Latitude, opt => opt.MapFrom(src => src.Latitude))
+                .ForPath(dest => dest.Coordinates!.Longitude, opt => opt.MapFrom(src => src.Longitude));
         }
     }
 }

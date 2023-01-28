@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static RybalkaWebAPI.Models.AppEnums;
 
 namespace RybalkaWebAPI.Models.Dto
 {
@@ -21,21 +22,16 @@ namespace RybalkaWebAPI.Models.Dto
         public DateTime? EndTime { get; set; }
 
         [Required]
-        public double Latitude { get; set; }
-
-        [Required]
-        public double Longitude { get; set; }
+        public CoordinatesDto? Coordinates { get; set; }
 
         [Required]
         public string? WaterBody { get; set; }
 
         [Required]
-        public string? FishingMethod { get; set; }
+        public FishingMethods? FishingMethod { get; set; }
 
-        [Required]
         public string? Bait { get; set; }
 
-        [Required]
         public string? Note { get; set; }
     }
 }

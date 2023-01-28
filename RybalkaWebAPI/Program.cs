@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
 using RybalkaWebAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
     options.SuppressMapClientErrors = true;
-});
+}).AddNewtonsoftJson(options =>
+        options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -29,9 +31,12 @@ builder.Services.AddSwaggerGen(c =>
         }
      );
 
-    var filePath = Path.Combine(System.AppContext.BaseDirectory, "RybalkaWebAPI.xml");
+    var filePath = Path.Combine(AppContext.BaseDirectory, "RybalkaWebAPI.xml");
     c.IncludeXmlComments(filePath);
 });
+
+// Must to set after AddNewtonsoftJson()
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
 
