@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using RybalkaWebAPI.Models;
-using RybalkaWebAPI.Models.Dto;
+using RybalkaWebAPI.Models.Dto.FishingNote;
+using RybalkaWebAPI.Models.Entity;
 
 namespace RybalkaWebAPI.AutoMapper
 {

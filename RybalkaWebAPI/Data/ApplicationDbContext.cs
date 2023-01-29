@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RybalkaWebAPI.Models;
+using RybalkaWebAPI.Models.Entity;
 
 namespace RybalkaWebAPI.Data
 {

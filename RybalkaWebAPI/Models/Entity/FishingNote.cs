@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using static RybalkaWebAPI.Models.AppEnums;
 
-namespace RybalkaWebAPI.Models
+namespace RybalkaWebAPI.Models.Entity
 {
     public class FishingNote
     {
@@ -18,6 +18,7 @@ namespace RybalkaWebAPI.Models
         public required string WaterBody { get; set; }
         public FishingMethods? FishingMethod { get; set; }
         public string? Bait { get; set; }
+        public decimal FishCount { get; set; }
         public string? Note { get; set; }
     }
 }

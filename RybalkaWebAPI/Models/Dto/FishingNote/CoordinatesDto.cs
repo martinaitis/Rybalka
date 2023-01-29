@@ -1,4 +1,4 @@
-﻿namespace RybalkaWebAPI.Models.Dto
+﻿namespace RybalkaWebAPI.Models.Dto.FishingNote
 {
     public class CoordinatesDto
     {

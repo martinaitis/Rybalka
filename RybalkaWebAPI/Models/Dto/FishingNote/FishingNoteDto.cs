@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static RybalkaWebAPI.Models.AppEnums;
 
-namespace RybalkaWebAPI.Models.Dto
+namespace RybalkaWebAPI.Models.Dto.FishingNote
 {
     public class FishingNoteDto
     {
@@ -31,6 +31,9 @@ namespace RybalkaWebAPI.Models.Dto
         public FishingMethods? FishingMethod { get; set; }
 
         public string? Bait { get; set; }
+
+        [Required]
+        public decimal? FishCount { get; set; }
 
         public string? Note { get; set; }
     }
