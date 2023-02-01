@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Models.Dto.FishingNote;
 using RybalkaWebAPI.Models.Entity;
+using RybalkaWebAPI.Services.WeatherForecast;
 
 namespace RybalkaWebAPI.Controllers
 {
@@ -13,18 +14,22 @@ namespace RybalkaWebAPI.Controllers
     public class FishingNoteApiController : ControllerBase
     {
         private const string GET_ROUTE_NAME = "GetNotes";
+
         private readonly ILogger<FishingNoteApiController> _logger;
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
+        private readonly WeatherForecastService _weatherForecastService;
 
         public FishingNoteApiController(
             ILogger<FishingNoteApiController> logger,
             ApplicationDbContext db,
-            IMapper mapper)
+            IMapper mapper,
+            WeatherForecastService weatherForecastService)
         {
             _logger = logger;
             _db = db;
             _mapper = mapper;
+            _weatherForecastService = weatherForecastService;
         }
 
         /// <remarks>
@@ -34,7 +39,7 @@ namespace RybalkaWebAPI.Controllers
         [HttpGet(Name = GET_ROUTE_NAME)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<FishingNoteDto>> Get(int id = 0, string user = "")
+        public ActionResult<IEnumerable<FishingNoteDto>> GetNotes(int id = 0, string user = "")
         {
             if (id != 0 && !user.IsNullOrEmpty())
             {
@@ -64,7 +69,7 @@ namespace RybalkaWebAPI.Controllers
                 _logger.LogWarning($"Action: {nameof(PostNote)} Message: {nameof(noteDto)} == null");
                 return BadRequest(noteDto);
             }
-            else if (DateTime.Compare((DateTime)noteDto.FishingDate!, DateTime.Now.AddDays(-7)) < 0)
+            else if (DateTime.Compare(noteDto.FishingDate!, DateTime.Now.AddDays(-7)) < 0)
             {
                 _logger.LogWarning($"Action: {nameof(PostNote)} " +
                     $"Message: Too late to create a note for fishind date - {noteDto.FishingDate}");
@@ -72,12 +77,26 @@ namespace RybalkaWebAPI.Controllers
             }
             else
             {
-                FishingNote note = _mapper.Map<FishingNote>(noteDto);
+                var forecast = await _weatherForecastService.GetHourWeatherForecast(
+                    noteDto.Coordinates!.Latitude,
+                    noteDto.Coordinates.Longitude,
+                    noteDto.StartTime);
+                if (forecast == null || forecast.Condition == null)
+                {
+                    throw new ArgumentNullException(nameof(forecast));
+                }
 
+                noteDto.Temp = forecast.Temp;
+                noteDto.WindKph = forecast.WindKph;
+                noteDto.WindDir = forecast.WindDir;
+                noteDto.CloudPct = forecast.CloudPct;
+                noteDto.ConditionText = forecast.Condition.Text;
+
+                FishingNote note = _mapper.Map<FishingNote>(noteDto);
                 _db.FishingNotes.Add(note);
                 await _db.SaveChangesAsync();
 
-                return StatusCode(StatusCodes.Status201Created);
+                return CreatedAtAction(nameof(GetNotes), new { id = note.Id }, noteDto);
             }
         }
 

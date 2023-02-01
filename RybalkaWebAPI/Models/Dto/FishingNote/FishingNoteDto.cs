@@ -13,13 +13,13 @@ namespace RybalkaWebAPI.Models.Dto.FishingNote
         public string? User { get; set; }
 
         [Required]
-        public DateTime? FishingDate { get; set; }
+        public DateTime FishingDate { get; set; }
 
         [Required]
-        public DateTime? StartTime { get; set; }
+        public DateTime StartTime { get; set; }
 
         [Required]
-        public DateTime? EndTime { get; set; }
+        public DateTime EndTime { get; set; }
 
         [Required]
         public CoordinatesDto? Coordinates { get; set; }
@@ -30,11 +30,14 @@ namespace RybalkaWebAPI.Models.Dto.FishingNote
         [Required]
         public FishingMethods? FishingMethod { get; set; }
 
-        public string? Bait { get; set; }
-
         [Required]
         public decimal? FishCount { get; set; }
-
+        public string? Bait { get; set; }
         public string? Note { get; set; }
+        public decimal? Temp { get; set; }
+        public decimal? WindKph { get; set; }
+        public string? WindDir { get; set; }
+        public decimal? CloudPct { get; set; }
+        public string? ConditionText { get; set; }
     }
 }
