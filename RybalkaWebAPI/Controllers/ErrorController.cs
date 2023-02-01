@@ -18,8 +18,8 @@ namespace RybalkaWebAPI.Controllers
         {
             var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>()!;
             _logger.LogError(
-                $"Endpoint: {exceptionHandlerFeature.Endpoint?.DisplayName}{System.Environment.NewLine}" +
-                $"Message: {exceptionHandlerFeature.Error.Message}{System.Environment.NewLine}" +
+                $"Endpoint: {exceptionHandlerFeature.Endpoint?.DisplayName}{Environment.NewLine}" +
+                $"Message: {exceptionHandlerFeature.Error.Message}{Environment.NewLine}" +
                 $"StackTrace: {exceptionHandlerFeature.Error.StackTrace}");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

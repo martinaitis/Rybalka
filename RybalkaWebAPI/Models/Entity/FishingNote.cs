@@ -20,5 +20,10 @@ namespace RybalkaWebAPI.Models.Entity
         public string? Bait { get; set; }
         public decimal FishCount { get; set; }
         public string? Note { get; set; }
+        public decimal? Temp { get; set; }
+        public decimal? WindKph { get; set; }
+        public string? WindDir { get; set; }
+        public decimal? CloudPct { get; set; }
+        public string? ConditionText { get; set; }
     }
 }
