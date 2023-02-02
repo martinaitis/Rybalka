@@ -12,5 +12,6 @@ namespace RybalkaWebAPI.Data
 
         public DbSet<FishingNote> FishingNotes { get; set;}
 
+        public DbSet<User> Users { get; set;}
     }
 }

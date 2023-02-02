@@ -11,17 +11,17 @@ namespace RybalkaWebAPI.Controllers
 {
     [Route("api/note")]
     [ApiController]
-    public class FishingNoteApiController : ControllerBase
+    public class FishingNoteController : ControllerBase
     {
         private const string GET_ROUTE_NAME = "GetNotes";
 
-        private readonly ILogger<FishingNoteApiController> _logger;
+        private readonly ILogger<FishingNoteController> _logger;
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         private readonly WeatherForecastService _weatherForecastService;
 
-        public FishingNoteApiController(
-            ILogger<FishingNoteApiController> logger,
+        public FishingNoteController(
+            ILogger<FishingNoteController> logger,
             ApplicationDbContext db,
             IMapper mapper,
             WeatherForecastService weatherForecastService)
@@ -83,7 +83,8 @@ namespace RybalkaWebAPI.Controllers
                     noteDto.StartTime);
                 if (forecast == null || forecast.Condition == null)
                 {
-                    throw new ArgumentNullException(nameof(forecast));
+                    _logger.LogWarning($"Action: {nameof(PostNote)} Message: {nameof(forecast)} == null");
+                    return await CompleteFishingNotePost(noteDto);
                 }
 
                 noteDto.Temp = forecast.Temp;
@@ -92,12 +93,16 @@ namespace RybalkaWebAPI.Controllers
                 noteDto.CloudPct = forecast.CloudPct;
                 noteDto.ConditionText = forecast.Condition.Text;
 
-                FishingNote note = _mapper.Map<FishingNote>(noteDto);
-                _db.FishingNotes.Add(note);
-                await _db.SaveChangesAsync();
-
-                return CreatedAtAction(nameof(GetNotes), new { id = note.Id }, noteDto);
+                return await CompleteFishingNotePost(noteDto);
             }
+        }
+        private async Task<ActionResult<FishingNoteDto>> CompleteFishingNotePost(FishingNoteDto noteDto)
+        {
+            FishingNote note = _mapper.Map<FishingNote>(noteDto);
+            _db.FishingNotes.Add(note);
+            await _db.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetNotes), new { id = note.Id }, noteDto);
         }
 
         [HttpDelete]
@@ -153,7 +158,7 @@ namespace RybalkaWebAPI.Controllers
                 return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
             }
 
-            _logger.LogWarning($"Action: {nameof(GetAllNotes)} Message: Notes table is empty");
+            _logger.LogWarning($"Action: {nameof(GetAllNotes)} Message: {nameof(notes)} table is empty");
             return NotFound();
         }
 
