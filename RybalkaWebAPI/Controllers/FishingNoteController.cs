@@ -70,14 +70,15 @@ namespace RybalkaWebAPI.Controllers
                 _logger.LogWarning($"Action: {nameof(PostNote)} Message: {message}");
                 return BadRequest(message);
             }
-            else if (DateTime.Compare(noteDto.StartTime!, DateTime.Now.AddDays(-7)) < 0)
-            {
-                var message = $"Fishing date should not be older than 7 days";
-                _logger.LogWarning($"Action: {nameof(PostNote)} " + $"Message: {message}");
-                return BadRequest(message);
-            }
             else
             {
+                if (DateTime.Compare(noteDto.StartTime!, DateTime.Now.AddDays(-7)) < 0)
+                {
+                    var message = $"Fishing date older than 7 days, forecast can not be calculated";
+                    _logger.LogWarning($"Action: {nameof(PostNote)} " + $"Message: {message}");
+                    return await CompleteFishingNotePost(noteDto);
+                }
+
                 var forecast = await _weatherForecastService.GetHourWeatherForecast(
                     noteDto.Coordinates!.Latitude,
                     noteDto.Coordinates.Longitude,
