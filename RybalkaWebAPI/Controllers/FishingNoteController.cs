@@ -66,14 +66,15 @@ namespace RybalkaWebAPI.Controllers
         {
             if (noteDto == null)
             {
-                _logger.LogWarning($"Action: {nameof(PostNote)} Message: {nameof(noteDto)} == null");
-                return BadRequest(noteDto);
+                var message = $"Request body does not contains {nameof(FishingNoteDto)}";
+                _logger.LogWarning($"Action: {nameof(PostNote)} Message: {message}");
+                return BadRequest(message);
             }
-            else if (DateTime.Compare(noteDto.FishingDate!, DateTime.Now.AddDays(-7)) < 0)
+            else if (DateTime.Compare(noteDto.StartTime!, DateTime.Now.AddDays(-7)) < 0)
             {
-                _logger.LogWarning($"Action: {nameof(PostNote)} " +
-                    $"Message: Too late to create a note for fishind date - {noteDto.FishingDate}");
-                return BadRequest("Fishing date should not be older than 7 days.");
+                var message = $"Fishing date should not be older than 7 days";
+                _logger.LogWarning($"Action: {nameof(PostNote)} " + $"Message: {message}");
+                return BadRequest(message);
             }
             else
             {
@@ -113,8 +114,9 @@ namespace RybalkaWebAPI.Controllers
             var note = _db.FishingNotes.FirstOrDefault(n => n.Id == id);
             if (note == null)
             {
-                _logger.LogWarning($"Action: {nameof(DeleteNote)} Message: note with id:{id} does not exist in DB");
-                return NotFound();
+                var message = $"Fishing note with id:{id} does not exist in DB";
+                _logger.LogWarning($"Action: {nameof(DeleteNote)} Message: {message}");
+                return NotFound(message);
             }
             else
             {
@@ -132,15 +134,17 @@ namespace RybalkaWebAPI.Controllers
         {
             if (noteDto == null)
             {
-                _logger.LogWarning($"Action: {nameof(UpdateNote)} Message: {nameof(noteDto)} == null");
-                return BadRequest(noteDto);
+                var message = $"Request body does not contains {nameof(FishingNoteDto)}";
+                _logger.LogWarning($"Action: {nameof(UpdateNote)} Message: {message}");
+                return BadRequest(message);
             }
 
             var note = _db.FishingNotes.FirstOrDefault(n => n.Id == id);
             if (note == null)
             {
-                _logger.LogWarning($"Action: {nameof(UpdateNote)} Message: note with id:{id} does not exist in DB");
-                return NotFound();
+                var message = $"Fishing note with id:{id} does not exist in DB";
+                _logger.LogWarning($"Action: {nameof(UpdateNote)} Message: {message}");
+                return NotFound(message);
             }
 
             _mapper.Map(noteDto, note);
@@ -167,8 +171,9 @@ namespace RybalkaWebAPI.Controllers
             var note = _db.FishingNotes.AsNoTracking().FirstOrDefault(n => n.Id == id);
             if (note == null)
             {
-                _logger.LogWarning($"Action: {nameof(GetNoteById)} Message: note with id:{id} does not exist in DB");
-                return NotFound();
+                var message = $"Fishing note with id:{id} does not exist in DB";
+                _logger.LogWarning($"Action: {nameof(GetNoteById)} Message: {message}");
+                return NotFound(message);
             }
 
             return Ok(_mapper.Map<FishingNoteDto>(note));

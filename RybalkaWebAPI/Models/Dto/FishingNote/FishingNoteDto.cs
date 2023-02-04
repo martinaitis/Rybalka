@@ -12,8 +12,7 @@ namespace RybalkaWebAPI.Models.Dto.FishingNote
         [MinLength(4)]
         public string? User { get; set; }
 
-        [Required]
-        public DateTime FishingDate { get; set; }
+        public string? Title { get; set; }
 
         [Required]
         public DateTime StartTime { get; set; }
