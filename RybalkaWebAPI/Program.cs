@@ -14,6 +14,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
 });
 
+const string CORS_POLICY_ALL_ORIGINS = "AllOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORS_POLICY_ALL_ORIGINS,
+        policy =>
+        {
+            policy.AllowAnyOrigin();
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+        });
+});
+
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
     options.SuppressMapClientErrors = true;
@@ -53,6 +65,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 app.UseHttpsRedirection();
 
 app.UseExceptionHandler("/error");
+
+app.UseCors(CORS_POLICY_ALL_ORIGINS);
 
 app.UseAuthorization();
 
