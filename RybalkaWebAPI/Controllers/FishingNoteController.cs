@@ -160,7 +160,9 @@ namespace RybalkaWebAPI.Controllers
             var notes = _db.FishingNotes.AsNoTracking();
             if (notes.Any())
             {
-                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+                var notesdto = _mapper.Map<IEnumerable<FishingNoteDto>>(notes)
+                    .OrderByDescending(n => n.StartTime);
+                return Ok(notesdto);
             }
             var message = $"{nameof(FishingNoteDto)} table is empty";
             _logger.LogWarning(message);
@@ -185,7 +187,9 @@ namespace RybalkaWebAPI.Controllers
             var notes = _db.FishingNotes.AsNoTracking().Where(n => n.User == user);
             if (notes.Any())
             {
-                return Ok(_mapper.Map<IEnumerable<FishingNoteDto>>(notes));
+                var notesDto = _mapper.Map<IEnumerable<FishingNoteDto>>(notes)
+                    .OrderByDescending(n => n.StartTime);
+                return Ok(notesDto);
             }
 
             var message = $"Fishing notes by user:{user} does not exist in DB";
