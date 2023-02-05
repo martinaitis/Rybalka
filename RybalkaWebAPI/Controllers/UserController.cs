@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RybalkaWebAPI.Data;
-using RybalkaWebAPI.Models.Dto.FishingNote;
 using RybalkaWebAPI.Models.Dto.User;
 using RybalkaWebAPI.Models.Entity;
 

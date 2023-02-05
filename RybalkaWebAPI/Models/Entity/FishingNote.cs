@@ -19,7 +19,7 @@ namespace RybalkaWebAPI.Models.Entity
         public FishingMethods? FishingMethod { get; set; }
         public string? Bait { get; set; }
         public decimal? FishCount { get; set; }
-        public string? Note { get; set; }
+        public string? Description { get; set; }
         public decimal? Temp { get; set; }
         public decimal? WindKph { get; set; }
         public string? WindDir { get; set; }
