@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RybalkaWebAPI.Data;
+using RybalkaWebAPI.Models.Dto.FishingNote;
 using RybalkaWebAPI.Models.Dto.User;
 using RybalkaWebAPI.Models.Entity;
 
@@ -40,9 +41,9 @@ namespace RybalkaWebAPI.Controllers
             {
                 return Ok(users);
             }
-
-            _logger.LogWarning($"Action: {nameof(GetUsers)} Message: {nameof(users)} table is empty");
-            return NotFound();
+            var message = $"{nameof(UserDto)} table is empty";
+            _logger.LogWarning(message);
+            return NotFound(message);
         }
 
         [HttpPost]
@@ -52,8 +53,9 @@ namespace RybalkaWebAPI.Controllers
         {
             if (userDto == null)
             {
-                _logger.LogWarning($"Action: {nameof(PostUser)} Message: {nameof(userDto)} == null");
-                return BadRequest(userDto);
+                var message = $"Request body does not contains {nameof(UserDto)}";
+                _logger.LogWarning(message);
+                return BadRequest(message);
             }
 
             User user = _mapper.Map<User>(userDto);
@@ -61,6 +63,26 @@ namespace RybalkaWebAPI.Controllers
             await _db.SaveChangesAsync();
 
             return StatusCode(StatusCodes.Status201Created);
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var user = _db.Users.FirstOrDefault(n => n.Id == id);
+            if (user == null)
+            {
+                var message = $"User with id:{id} does not exist in DB";
+                _logger.LogWarning($"Action: {nameof(DeleteUser)} Message: {message}");
+                return NotFound(message);
+            }
+            else
+            {
+                _db.Users.Remove(user);
+                await _db.SaveChangesAsync();
+                return NoContent();
+            }
         }
 
         [Route("login")]
@@ -72,8 +94,8 @@ namespace RybalkaWebAPI.Controllers
         {
             if (username.IsNullOrEmpty() || password.IsNullOrEmpty())
             {
-                _logger.LogWarning($"Action: {nameof(Login)} Message: Empty login data");
-                return BadRequest();
+                _logger.LogWarning("Empty login data");
+                return BadRequest("Empty login data");
             }
 
             var isAuthorized = await _db.Users.AsNoTracking()
@@ -82,9 +104,9 @@ namespace RybalkaWebAPI.Controllers
             {
                 return Ok();
             }
-
-            _logger.LogWarning($"Action: {nameof(Login)} Message: {username} unauthorized to login");
-            return Unauthorized();
+            var message = $"{username} unauthorized to login";
+            _logger.LogWarning(message);
+            return Unauthorized(message);
         }
     }
 }

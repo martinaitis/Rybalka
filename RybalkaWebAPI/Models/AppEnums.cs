@@ -4,7 +4,7 @@
     {
         public enum FishingMethods
         {
-            Spinning, Float, Bottom
+            Spinning, Float, Bottom, IceFishing, Other
         }
     }
 }
