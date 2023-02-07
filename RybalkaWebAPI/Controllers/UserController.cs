@@ -2,26 +2,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RybalkaWebAPI.Attributes;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Models.Dto.User;
 using RybalkaWebAPI.Models.Entity;
 
 namespace RybalkaWebAPI.Controllers
 {
+    [ServiceFilter(typeof(LogAttribute))]
     [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
 
         public UserController(
-            ILogger<UserController> logger,
             ApplicationDbContext db,
             IMapper mapper)
         {
-            _logger = logger;
             _db = db;
             _mapper = mapper;
         }
@@ -41,7 +40,6 @@ namespace RybalkaWebAPI.Controllers
                 return Ok(users);
             }
             var message = $"{nameof(UserDto)} table is empty";
-            _logger.LogWarning(message);
             return NotFound(message);
         }
 
@@ -53,7 +51,6 @@ namespace RybalkaWebAPI.Controllers
             if (userDto == null)
             {
                 var message = $"Request body does not contains {nameof(UserDto)}";
-                _logger.LogWarning(message);
                 return BadRequest(message);
             }
 
@@ -73,7 +70,6 @@ namespace RybalkaWebAPI.Controllers
             if (user == null)
             {
                 var message = $"User with id:{id} does not exist in DB";
-                _logger.LogWarning($"Action: {nameof(DeleteUser)} Message: {message}");
                 return NotFound(message);
             }
             else
@@ -93,7 +89,6 @@ namespace RybalkaWebAPI.Controllers
         {
             if (username.IsNullOrEmpty() || password.IsNullOrEmpty())
             {
-                _logger.LogWarning("Empty login data");
                 return BadRequest("Empty login data");
             }
 
@@ -104,7 +99,6 @@ namespace RybalkaWebAPI.Controllers
                 return Ok();
             }
             var message = $"{username} unauthorized to login";
-            _logger.LogWarning(message);
             return Unauthorized(message);
         }
     }

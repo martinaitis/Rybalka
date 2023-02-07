@@ -1,12 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
+using RybalkaWebAPI.Attributes;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Services.WeatherForecast;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var serilogOutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Username} {Message:lj}{NewLine}{Exception}";
+var logger = new LoggerConfiguration()
+    .WriteTo.File(path: "../logs/webapi-.log",
+    rollingInterval: RollingInterval.Day,
+    outputTemplate: serilogOutputTemplate)
+    .WriteTo.Console(outputTemplate: serilogOutputTemplate)
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -25,6 +36,8 @@ builder.Services.AddCors(options =>
             policy.AllowAnyMethod();
         });
 });
+
+builder.Services.AddScoped<LogAttribute>();
 
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
@@ -55,12 +68,8 @@ builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

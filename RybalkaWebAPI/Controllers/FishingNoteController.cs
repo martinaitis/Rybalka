@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RybalkaWebAPI.Attributes;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Models.Dto.FishingNote;
 using RybalkaWebAPI.Models.Entity;
@@ -9,6 +10,7 @@ using RybalkaWebAPI.Services.WeatherForecast;
 
 namespace RybalkaWebAPI.Controllers
 {
+    [ServiceFilter(typeof(LogAttribute))]
     [Route("api/note")]
     [ApiController]
     public class FishingNoteController : ControllerBase
@@ -67,15 +69,13 @@ namespace RybalkaWebAPI.Controllers
             if (noteDto == null)
             {
                 var message = $"Request body does not contains {nameof(FishingNoteDto)}";
-                _logger.LogWarning(message);
                 return BadRequest(message);
             }
             else
             {
                 if (DateTime.Compare(noteDto.StartTime!, DateTime.Now.AddDays(-7)) < 0)
                 {
-                    var message = $"Fishing date older than 7 days, forecast can not be calculated";
-                    _logger.LogWarning(message);
+                    _logger.LogWarning($"Fishing date older than 7 days, forecast can not be calculated");
                     return await CompleteFishingNotePost(noteDto);
                 }
 
@@ -116,7 +116,6 @@ namespace RybalkaWebAPI.Controllers
             if (note == null)
             {
                 var message = $"Fishing note with id:{id} does not exist in DB";
-                _logger.LogWarning(message);
                 return NotFound(message);
             }
             else
@@ -136,7 +135,6 @@ namespace RybalkaWebAPI.Controllers
             if (noteDto == null)
             {
                 var message = $"Request body does not contains {nameof(FishingNoteDto)}";
-                _logger.LogWarning(message);
                 return BadRequest(message);
             }
 
@@ -144,7 +142,6 @@ namespace RybalkaWebAPI.Controllers
             if (note == null)
             {
                 var message = $"Fishing note with id:{id} does not exist in DB";
-                _logger.LogWarning(message);
                 return NotFound(message);
             }
 
@@ -165,7 +162,6 @@ namespace RybalkaWebAPI.Controllers
                 return Ok(notesdto);
             }
             var message = $"{nameof(FishingNoteDto)} table is empty";
-            _logger.LogWarning(message);
             return NotFound(message);
         }
 
@@ -175,7 +171,6 @@ namespace RybalkaWebAPI.Controllers
             if (note == null)
             {
                 var message = $"Fishing note with id:{id} does not exist in DB";
-                _logger.LogWarning(message);
                 return NotFound(message);
             }
 
@@ -192,8 +187,7 @@ namespace RybalkaWebAPI.Controllers
                 return Ok(notesDto);
             }
 
-            var message = $"Fishing notes by user:{user} does not exist in DB";
-            _logger.LogWarning(message);
+            _logger.LogWarning($"Fishing notes by user:{user} does not exist in DB");
             return NoContent();
         }
     }
