@@ -16,7 +16,7 @@ namespace RybalkaWebAPI.Models.Entity
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public required string WaterBody { get; set; }
-        public FishingMethods? FishingMethod { get; set; }
+        public FishingMethod? FishingMethod { get; set; }
         public string? Bait { get; set; }
         public decimal? FishCount { get; set; }
         public string? Description { get; set; }

@@ -2,9 +2,13 @@
 {
     public class AppEnums
     {
-        public enum FishingMethods
+        public enum FishingMethod
         {
-            Spinning, Float, Bottom, IceFishing, Other
+            Spinning = 1,
+            Float,
+            Bottom,
+            IceFishing,
+            Other
         }
     }
 }
