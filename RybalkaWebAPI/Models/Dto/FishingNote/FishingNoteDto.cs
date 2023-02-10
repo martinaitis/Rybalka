@@ -27,7 +27,7 @@ namespace RybalkaWebAPI.Models.Dto.FishingNote
         public string? WaterBody { get; set; }
 
         [Required]
-        public FishingMethod? FishingMethod { get; set; }
+        public int? FishingMethod { get; set; }
 
         [Required]
         public decimal? FishCount { get; set; }
