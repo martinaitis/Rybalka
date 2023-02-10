@@ -130,7 +130,7 @@ namespace RybalkaWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateNote(int id, [FromBody]FishingNoteDto noteDto)
+        public async Task<IActionResult> UpdateNote([FromBody]FishingNoteDto noteDto)
         {
             if (noteDto == null)
             {
@@ -138,10 +138,10 @@ namespace RybalkaWebAPI.Controllers
                 return BadRequest(message);
             }
 
-            var note = _db.FishingNotes.FirstOrDefault(n => n.Id == id);
+            var note = _db.FishingNotes.FirstOrDefault(n => n.Id == noteDto.Id);
             if (note == null)
             {
-                var message = $"Fishing note with id:{id} does not exist in DB";
+                var message = $"Fishing note with id:{noteDto.Id} does not exist in DB";
                 return NotFound(message);
             }
 

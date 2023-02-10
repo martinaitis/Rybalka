@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace RybalkaWebAPI.Attributes
 {
@@ -15,31 +14,19 @@ namespace RybalkaWebAPI.Attributes
         public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
             var request = actionContext.ActionDescriptor.DisplayName;
+
             _logger.LogInformation("REQUEST {request}", request);
         }
 
-        public override void OnActionExecuted(ActionExecutedContext actionExecutedContext)
+        public override void OnResultExecuted(ResultExecutedContext resultExecutedContext)
         {
-            var request = actionExecutedContext.ActionDescriptor.DisplayName;
-            ObjectResult result = (ObjectResult)actionExecutedContext.Result!;
-            var responseCode = result.StatusCode;
-            
-            if (responseCode >= 200 && responseCode <= 299)
-            {
-                _logger.LogInformation(
-                    "RESPONSE: {request}\n RESPONSE CODE: {responseCode}",
-                    request,
-                    responseCode);
+            var responseTo = resultExecutedContext.ActionDescriptor.DisplayName;
+            var responseCode = resultExecutedContext.HttpContext.Response.StatusCode;
 
-                return;
-            }
-
-            var responseValue = result.Value;
             _logger.LogInformation(
-                "RESPONSE: {request}\n RESPONSE CODE: {responseCode}\n RESPONSE VALUE: {responseValue} ",
-                request,
-                responseCode,
-                responseValue);
+                "RESPONSE CODE: {responseTo} RESPONSE TO: {responseCode}",
+                responseTo,
+                responseCode);
         }
     }
 }

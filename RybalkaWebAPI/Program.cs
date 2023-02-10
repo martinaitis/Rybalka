@@ -5,15 +5,21 @@ using RybalkaWebAPI.Attributes;
 using RybalkaWebAPI.Data;
 using RybalkaWebAPI.Services.WeatherForecast;
 using Serilog;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var serilogOutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Username} {Message:lj}{NewLine}{Exception}";
+var serilogOutputTemplate = "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}";
 var logger = new LoggerConfiguration()
-    .WriteTo.File(path: "../logs/webapi-.log",
-    rollingInterval: RollingInterval.Day,
-    outputTemplate: serilogOutputTemplate)
-    .WriteTo.Console(outputTemplate: serilogOutputTemplate)
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+    .WriteTo.File(
+        path: "../logs/webapi-.log", 
+        rollingInterval: RollingInterval.Day,
+        outputTemplate: serilogOutputTemplate)
+    .WriteTo.Console(
+        outputTemplate: serilogOutputTemplate)
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
