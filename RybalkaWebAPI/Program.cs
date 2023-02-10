@@ -69,9 +69,6 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(filePath);
 });
 
-// Must to set after AddNewtonsoftJson()
-builder.Services.AddSwaggerGenNewtonsoftSupport();
-
 var app = builder.Build();
 
 app.UseSwagger();
