@@ -33,12 +33,14 @@ namespace RybalkaWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<string>>> GetUsers()
         {
-            var users = await _db.Users.Select(u => u.Username).ToListAsync();
+            var users = _db.Users.AsNoTracking();
 
             if (users.Any())
             {
-                return Ok(users);
+                var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
+                return Ok(usersDto);
             }
+
             var message = $"{nameof(UserDto)} table is empty";
             return NotFound(message);
         }
