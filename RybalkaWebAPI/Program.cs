@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
+using Rybalka.Core.AutoMapper;
+using Rybalka.Core.Interfaces.Clients;
+using Rybalka.Core.Interfaces.Repositories;
+using Rybalka.Core.Interfaces.Services;
+using Rybalka.Core.Services;
+using Rybalka.Infrastructure.AutoMapper;
+using Rybalka.Infrastructure.Clients.WeatherForecast;
+using Rybalka.Infrastructure.Data;
+using Rybalka.Infrastructure.Repositories;
 using RybalkaWebAPI.Attributes;
-using RybalkaWebAPI.Data;
-using RybalkaWebAPI.Services.WeatherForecast;
 using Serilog;
 using Serilog.Events;
 
@@ -24,7 +31,7 @@ var logger = new LoggerConfiguration()
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(FishingNoteProfile), typeof(WeatherForecastProfile));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -43,7 +50,13 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddHttpClient<IWeatherForecastClient, WeatherForecastClient>();
+
 builder.Services.AddScoped<LogAttribute>();
+builder.Services.AddScoped<IFishingNoteService, FishingNoteService>();
+builder.Services.AddScoped<IFishingNoteRepository, FishingNoteRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
@@ -51,9 +64,6 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 }).AddNewtonsoftJson(options =>
         options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
-builder.Services.AddHttpClient<WeatherForecastService>();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {

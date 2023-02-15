@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Rybalka.Core.Dto.User;
+using Rybalka.Core.Interfaces.Services;
 using RybalkaWebAPI.Attributes;
-using RybalkaWebAPI.Data;
-using RybalkaWebAPI.Models.Dto.User;
-using RybalkaWebAPI.Models.Entity;
 
 namespace RybalkaWebAPI.Controllers
 {
@@ -14,15 +12,15 @@ namespace RybalkaWebAPI.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         public UserController(
-            ApplicationDbContext db,
-            IMapper mapper)
+            IMapper mapper,
+            IUserService userService)
         {
-            _db = db;
             _mapper = mapper;
+            _userService = userService;
         }
 
         /// <remarks>
@@ -33,16 +31,13 @@ namespace RybalkaWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<string>>> GetUsers()
         {
-            var users = _db.Users.AsNoTracking();
-
+            var users = await _userService.GetAllUsers();
             if (users.Any())
             {
-                var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
-                return Ok(usersDto);
+                return Ok(users);
             }
 
-            var message = $"{nameof(UserDto)} table is empty";
-            return NotFound(message);
+            return NoContent();
         }
 
         [HttpPost]
@@ -52,13 +47,10 @@ namespace RybalkaWebAPI.Controllers
         {
             if (userDto == null)
             {
-                var message = $"Request body does not contains {nameof(UserDto)}";
-                return BadRequest(message);
+                return BadRequest($"Request body does not contains {nameof(UserDto)}");
             }
 
-            User user = _mapper.Map<User>(userDto);
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
+            await _userService.CreateUser(userDto);
 
             return StatusCode(StatusCodes.Status201Created);
         }
@@ -68,40 +60,34 @@ namespace RybalkaWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = _db.Users.FirstOrDefault(n => n.Id == id);
-            if (user == null)
+            if (await _userService.DeleteUser(id))
             {
-                var message = $"User with id:{id} does not exist in DB";
-                return NotFound(message);
-            }
-            else
-            {
-                _db.Users.Remove(user);
-                await _db.SaveChangesAsync();
                 return NoContent();
             }
+
+            return NotFound($"User with id:{id} does not exist in DB");
         }
 
         [Route("login")]
-        [HttpGet]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login([FromBody] UserDto userDto)
         {
-            if (username.IsNullOrEmpty() || password.IsNullOrEmpty())
+            if (userDto == null 
+                || userDto.UserName.IsNullOrEmpty() 
+                || userDto.Password.IsNullOrEmpty())
             {
                 return BadRequest("Empty login data");
             }
 
-            var isAuthorized = await _db.Users.AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Username == username && u.Password == password);
-            if (isAuthorized != null)
+            if (await _userService.Login(userDto))
             {
                 return Ok();
             }
-            var message = $"{username} unauthorized to login";
-            return Unauthorized(message);
+
+            return Unauthorized($"{userDto.UserName} unauthorized to login");
         }
     }
 }

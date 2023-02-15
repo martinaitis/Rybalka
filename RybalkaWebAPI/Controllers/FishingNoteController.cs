@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Rybalka.Core.Dto.FishingNote;
+using Rybalka.Core.Interfaces.Services;
+using Rybalka.Infrastructure.Data;
 using RybalkaWebAPI.Attributes;
-using RybalkaWebAPI.Data;
-using RybalkaWebAPI.Models.Dto.FishingNote;
-using RybalkaWebAPI.Models.Entity;
-using RybalkaWebAPI.Services.WeatherForecast;
 
 namespace RybalkaWebAPI.Controllers
 {
@@ -19,19 +16,16 @@ namespace RybalkaWebAPI.Controllers
 
         private readonly ILogger<FishingNoteController> _logger;
         private readonly ApplicationDbContext _db;
-        private readonly IMapper _mapper;
-        private readonly WeatherForecastService _weatherForecastService;
+        private readonly IFishingNoteService _fishingNoteService;
 
         public FishingNoteController(
             ILogger<FishingNoteController> logger,
             ApplicationDbContext db,
-            IMapper mapper,
-            WeatherForecastService weatherForecastService)
+            IFishingNoteService fishingNoteService)
         {
             _logger = logger;
             _db = db;
-            _mapper = mapper;
-            _weatherForecastService = weatherForecastService;
+            _fishingNoteService = fishingNoteService;
         }
 
         /// <remarks>
@@ -41,7 +35,7 @@ namespace RybalkaWebAPI.Controllers
         [HttpGet(Name = GET_ROUTE_NAME)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<FishingNoteDto>> GetNotes(int id = 0, string user = "")
+        public async Task<ActionResult<List<FishingNoteDto>>> GetNotes(int id = 0, string user = "")
         {
             if (id != 0 && !user.IsNullOrEmpty())
             {
@@ -49,15 +43,15 @@ namespace RybalkaWebAPI.Controllers
             }
             else if (id != 0)
             {
-                return GetNoteById(id);
+                return await GetNoteById(id);
             }
             else if (!user.IsNullOrEmpty())
             {
-                return GetNotesByUser(user);
+                return await GetNotesByUser(user);
             }
             else
             {
-                return GetAllNotes();
+                return await GetAllNotes();
             }
         }
 
@@ -68,43 +62,13 @@ namespace RybalkaWebAPI.Controllers
         {
             if (noteDto == null)
             {
-                var message = $"Request body does not contains {nameof(FishingNoteDto)}";
-                return BadRequest(message);
+                return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
             }
             else
             {
-                if (DateTime.Compare(noteDto.StartTime!, DateTime.Now.AddDays(-7)) < 0)
-                {
-                    _logger.LogWarning($"Fishing date older than 7 days, forecast can not be calculated");
-                    return await CompleteFishingNotePost(noteDto);
-                }
-
-                var forecast = await _weatherForecastService.GetHourWeatherForecast(
-                    noteDto.Coordinates!.Latitude,
-                    noteDto.Coordinates.Longitude,
-                    noteDto.StartTime);
-                if (forecast == null || forecast.Condition == null)
-                {
-                    _logger.LogWarning($"No forecast data");
-                    return await CompleteFishingNotePost(noteDto);
-                }
-
-                noteDto.Temp = forecast.Temp;
-                noteDto.WindKph = forecast.WindKph;
-                noteDto.WindDir = forecast.WindDir;
-                noteDto.CloudPct = forecast.CloudPct;
-                noteDto.ConditionText = forecast.Condition.Text;
-
-                return await CompleteFishingNotePost(noteDto);
+                var createdNoteDto = await _fishingNoteService.CreateFishingNote(noteDto);
+                return CreatedAtAction(nameof(GetNotes), new { id = createdNoteDto.Id }, createdNoteDto);
             }
-        }
-        private async Task<ActionResult<FishingNoteDto>> CompleteFishingNotePost(FishingNoteDto noteDto)
-        {
-            FishingNote note = _mapper.Map<FishingNote>(noteDto);
-            _db.FishingNotes.Add(note);
-            await _db.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetNotes), new { id = note.Id }, noteDto);
         }
 
         [HttpDelete]
@@ -112,82 +76,63 @@ namespace RybalkaWebAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteNote(int id)
         {
-            var note = _db.FishingNotes.FirstOrDefault(n => n.Id == id);
-            if (note == null)
+            if (await _fishingNoteService.DeleteFishingNote(id))
             {
-                var message = $"Fishing note with id:{id} does not exist in DB";
-                return NotFound(message);
-            }
-            else
-            {
-                _db.FishingNotes.Remove(note);
-                await _db.SaveChangesAsync();
                 return NoContent();
             }
+
+            return NotFound($"Fishing note with id:{id} does not exist in DB");
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateNote([FromBody]FishingNoteDto noteDto)
+        public async Task<IActionResult> UpdateNote([FromBody] FishingNoteDto noteDto)
         {
             if (noteDto == null)
             {
-                var message = $"Request body does not contains {nameof(FishingNoteDto)}";
-                return BadRequest(message);
+                return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
             }
 
-            var note = _db.FishingNotes.FirstOrDefault(n => n.Id == noteDto.Id);
-            if (note == null)
+            if (await _fishingNoteService.UpdateFishingNote(noteDto))
             {
-                var message = $"Fishing note with id:{noteDto.Id} does not exist in DB";
-                return NotFound(message);
+                return NoContent();
             }
 
-            _mapper.Map(noteDto, note);
-            _db.Update(note);
-            await _db.SaveChangesAsync();
+            return NotFound($"Fishing note with id:{noteDto.Id} does not exist in DB");
+        }
+
+        private async Task<ActionResult<List<FishingNoteDto>>> GetAllNotes()
+        {
+            var notes = await _fishingNoteService.GetAllFishingNotes();
+            if (notes.Any())
+            {
+                return Ok(notes.OrderByDescending(n => n.StartTime));
+            }
 
             return NoContent();
         }
 
-        private ActionResult<IEnumerable<FishingNoteDto>> GetAllNotes()
+        private async Task<ActionResult<List<FishingNoteDto>>> GetNoteById(int id)
         {
-            var notes = _db.FishingNotes.AsNoTracking();
-            if (notes.Any())
-            {
-                var notesdto = _mapper.Map<IEnumerable<FishingNoteDto>>(notes)
-                    .OrderByDescending(n => n.StartTime);
-                return Ok(notesdto);
-            }
-            var message = $"{nameof(FishingNoteDto)} table is empty";
-            return NotFound(message);
-        }
-
-        private ActionResult<IEnumerable<FishingNoteDto>> GetNoteById(int id)
-        {
-            var note = _db.FishingNotes.AsNoTracking().FirstOrDefault(n => n.Id == id);
+            var note = await _fishingNoteService.GetFishingNoteById(id);
             if (note == null)
             {
-                var message = $"Fishing note with id:{id} does not exist in DB";
-                return NotFound(message);
+                return NotFound($"Fishing note with id:{id} does not exist in DB");
             }
 
-            return Ok(_mapper.Map<FishingNoteDto>(note));
+            return Ok(note);
         }
 
-        private ActionResult<IEnumerable<FishingNoteDto>> GetNotesByUser(string user)
+        private async Task<ActionResult<List<FishingNoteDto>>> GetNotesByUser(string user)
         {
-            var notes = _db.FishingNotes.AsNoTracking().Where(n => n.User == user);
+            var notes = await _fishingNoteService.GetFishingNotesByUser(user);
             if (notes.Any())
             {
-                var notesDto = _mapper.Map<IEnumerable<FishingNoteDto>>(notes)
-                    .OrderByDescending(n => n.StartTime);
-                return Ok(notesDto);
+                return Ok(notes.OrderByDescending(n => n.StartTime));
             }
 
-            _logger.LogWarning($"Fishing notes by user:{user} does not exist in DB");
             return NoContent();
         }
     }
