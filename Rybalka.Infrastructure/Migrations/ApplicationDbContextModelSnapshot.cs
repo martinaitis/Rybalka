@@ -17,12 +17,12 @@ namespace RybalkaWebAPI.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.2")
+                .HasAnnotation("ProductVersion", "7.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Rybalka.Domain.Entities.FishingNote", b =>
+            modelBuilder.Entity("Rybalka.Core.Entities.FishingNote", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,7 +85,7 @@ namespace RybalkaWebAPI.Migrations
                     b.ToTable("FishingNotes");
                 });
 
-            modelBuilder.Entity("Rybalka.Domain.Entities.User", b =>
+            modelBuilder.Entity("Rybalka.Core.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -96,9 +96,6 @@ namespace RybalkaWebAPI.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Test")
-                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
