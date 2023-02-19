@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using Rybalka.Core.Dto.WeatherForecast;
 using Rybalka.Core.Interfaces.Clients;
 using System.Net.Http.Json;
@@ -8,18 +9,24 @@ namespace Rybalka.Infrastructure.Clients.WeatherForecast
 {
     public sealed class WeatherForecastClient : IWeatherForecastClient
     {
-        const string WEATHER_API_KEY = "10737a0a703044aa8e1223304232501"; //TODO: Move to config
-        const string WEATHER_API_HISTORY_ENDPOINT = "https://api.weatherapi.com/v1/history.json";
+        private const string WEATHER_API_HISTORY_ENDPOINT = "https://api.weatherapi.com/v1/history.json";
+
+        private readonly ILogger<WeatherForecastClient> _logger;
         private readonly HttpClient _httpClient;
         private readonly IMapper _mapper;
+        private readonly string? _weatherApiKey;
 
         public WeatherForecastClient(
+            ILogger<WeatherForecastClient> logger,
             HttpClient httpClient,
             IMapper mapper)
         {
+            _logger = logger;
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri(WEATHER_API_HISTORY_ENDPOINT);
             _mapper = mapper;
+
+            _weatherApiKey = Environment.GetEnvironmentVariable("WEATHER_API_KEY");
         }
 
         public async Task<HourWeatherForecastDto?> GetHourWeatherForecast(
@@ -27,15 +34,16 @@ namespace Rybalka.Infrastructure.Clients.WeatherForecast
             double longitude,
             DateTime time)
         {
-            if (DateTime.Compare(time!, DateTime.Now.AddDays(-7)) < 0)
+            if (DateTime.Compare(time, DateTime.Now.AddDays(-7)) < 0)
             {
+                _logger.LogWarning("Can not get older than 7 days weather forecast.");
                 return null;
             }
 
             try
             {
                 var query = HttpUtility.ParseQueryString(string.Empty);
-                query["?key"] = WEATHER_API_KEY;
+                query["?key"] = _weatherApiKey;
                 query["q"] = $"{latitude},{longitude}";
                 query["dt"] = $"{time.Year}-{time.Month}-{time.Day}";
                 query["hour"] = time.Hour.ToString();
@@ -45,8 +53,9 @@ namespace Rybalka.Infrastructure.Clients.WeatherForecast
 
                 return forecastDto;
             }
-            catch (Exception ex) //TODO: Log exception
+            catch (Exception ex)
             {
+                _logger.LogError($"{nameof(GetHourWeatherForecast)} Error message: ", ex);
                 return null;
             }
         }
