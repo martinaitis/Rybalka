@@ -67,27 +67,5 @@ namespace RybalkaWebAPI.Controllers
 
             return NotFound($"User with id:{id} does not exist in DB");
         }
-
-        [Route("login")]
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] UserDto userDto)
-        {
-            if (userDto == null 
-                || userDto.UserName.IsNullOrEmpty() 
-                || userDto.Password.IsNullOrEmpty())
-            {
-                return BadRequest("Empty login data");
-            }
-
-            if (await _userService.Login(userDto))
-            {
-                return Ok();
-            }
-
-            return Unauthorized($"{userDto.UserName} unauthorized to login");
-        }
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.IdentityModel.Tokens;
 using Rybalka.Core.Dto.FishingNote;
 using Rybalka.Core.Interfaces.Services;
-using Rybalka.Infrastructure.Data;
 using RybalkaWebAPI.Attributes;
 
 namespace RybalkaWebAPI.Controllers
@@ -14,17 +13,10 @@ namespace RybalkaWebAPI.Controllers
     {
         private const string GET_ROUTE_NAME = "GetNotes";
 
-        private readonly ILogger<FishingNoteController> _logger;
-        private readonly ApplicationDbContext _db;
         private readonly IFishingNoteService _fishingNoteService;
 
-        public FishingNoteController(
-            ILogger<FishingNoteController> logger,
-            ApplicationDbContext db,
-            IFishingNoteService fishingNoteService)
+        public FishingNoteController(IFishingNoteService fishingNoteService)
         {
-            _logger = logger;
-            _db = db;
             _fishingNoteService = fishingNoteService;
         }
 

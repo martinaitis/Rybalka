@@ -7,6 +7,5 @@ namespace Rybalka.Core.Interfaces.Services
         Task<List<UserDto>> GetAllUsers();
         Task CreateUser(UserDto userDto);
         Task<bool> DeleteUser(int id);
-        Task<bool> Login(UserDto userDto);
     }
 }

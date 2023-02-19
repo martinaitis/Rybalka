@@ -41,16 +41,5 @@ namespace Rybalka.Core.Services
 
             return true;
         }
-
-        public async Task<bool> Login(UserDto userDto)
-        {
-            var user = await _userRepository.GetUserByIdReadOnly(userDto.Id);
-            if (userDto.Password != userDto.Password)
-            {
-                return false;
-            }
-
-            return true;
-        }
     }
 }
