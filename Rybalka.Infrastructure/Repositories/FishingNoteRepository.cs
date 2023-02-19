@@ -13,42 +13,42 @@ namespace Rybalka.Infrastructure.Repositories
             _db = db;
         }
 
-        public async Task<List<FishingNote>> GetFishingNotesReadOnly()
+        public async Task<List<FishingNote>> GetFishingNotesReadOnly(CancellationToken ct)
         {
-            return await _db.FishingNotes.AsNoTracking().ToListAsync();
+            return await _db.FishingNotes.AsNoTracking().ToListAsync(ct);
         }
 
-        public async Task<FishingNote?> GetFishingNoteByIdReadOnly(int id)
+        public async Task<FishingNote?> GetFishingNoteByIdReadOnly(int id, CancellationToken ct)
         {
-            return await _db.FishingNotes.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id);
+            return await _db.FishingNotes.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id, ct);
         }
 
-        public async Task<FishingNote?> GetFishingNoteById(int id)
+        public async Task<FishingNote?> GetFishingNoteById(int id, CancellationToken ct)
         {
-            return await _db.FishingNotes.FirstOrDefaultAsync(n => n.Id == id);
+            return await _db.FishingNotes.FirstOrDefaultAsync(n => n.Id == id, ct);
         }
 
-        public async Task<List<FishingNote>> GetFishingNotesByUserReadOnly(string user)
+        public async Task<List<FishingNote>> GetFishingNotesByUserReadOnly(string user, CancellationToken ct)
         {
-            return await _db.FishingNotes.AsNoTracking().Where(n => n.User == user).ToListAsync();
+            return await _db.FishingNotes.AsNoTracking().Where(n => n.User == user).ToListAsync(ct);
         }
 
-        public async Task CreateFishingNote(FishingNote note)
+        public async Task CreateFishingNote(FishingNote note, CancellationToken ct)
         {
             _db.FishingNotes.Add(note);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteFishingNote(FishingNote note)
+        public async Task DeleteFishingNote(FishingNote note, CancellationToken ct)
         {
             _db.FishingNotes.Remove(note);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
         }
 
-        public async Task UpdateFishingNote(FishingNote note)
+        public async Task UpdateFishingNote(FishingNote note, CancellationToken ct)
         {
             _db.Update(note);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
         }
     }
 }

@@ -29,9 +29,9 @@ namespace RybalkaWebAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<string>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<string>>> GetUsers(CancellationToken ct)
         {
-            var users = await _userService.GetAllUsers();
+            var users = await _userService.GetAllUsers(ct);
             if (users.Any())
             {
                 return Ok(users);
@@ -43,14 +43,14 @@ namespace RybalkaWebAPI.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PostUser([FromBody] UserDto userDto)
+        public async Task<IActionResult> PostUser([FromBody] UserDto userDto, CancellationToken ct)
         {
             if (userDto == null)
             {
                 return BadRequest($"Request body does not contains {nameof(UserDto)}");
             }
 
-            await _userService.CreateUser(userDto);
+            await _userService.CreateUser(userDto, ct);
 
             return StatusCode(StatusCodes.Status201Created);
         }
@@ -58,9 +58,9 @@ namespace RybalkaWebAPI.Controllers
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id, CancellationToken ct)
         {
-            if (await _userService.DeleteUser(id))
+            if (await _userService.DeleteUser(id, ct))
             {
                 return NoContent();
             }

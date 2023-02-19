@@ -4,8 +4,8 @@ namespace Rybalka.Core.Interfaces.Services
 {
     public interface IUserService
     {
-        Task<List<UserDto>> GetAllUsers();
-        Task CreateUser(UserDto userDto);
-        Task<bool> DeleteUser(int id);
+        Task<List<UserDto>> GetAllUsers(CancellationToken ct);
+        Task CreateUser(UserDto userDto, CancellationToken ct);
+        Task<bool> DeleteUser(int id, CancellationToken ct);
     }
 }

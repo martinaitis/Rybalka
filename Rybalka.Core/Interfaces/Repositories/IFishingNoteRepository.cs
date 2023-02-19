@@ -4,12 +4,12 @@ namespace Rybalka.Core.Interfaces.Repositories
 {
     public interface IFishingNoteRepository
     {
-        Task<List<FishingNote>> GetFishingNotesReadOnly();
-        Task<FishingNote?> GetFishingNoteByIdReadOnly(int id);
-        Task<FishingNote?> GetFishingNoteById(int id);
-        Task<List<FishingNote>> GetFishingNotesByUserReadOnly(string user);
-        Task CreateFishingNote(FishingNote note);
-        Task DeleteFishingNote(FishingNote note);
-        Task UpdateFishingNote(FishingNote note);
+        Task<List<FishingNote>> GetFishingNotesReadOnly(CancellationToken ct);
+        Task<FishingNote?> GetFishingNoteByIdReadOnly(int id, CancellationToken ct);
+        Task<FishingNote?> GetFishingNoteById(int id, CancellationToken ct);
+        Task<List<FishingNote>> GetFishingNotesByUserReadOnly(string user, CancellationToken ct);
+        Task CreateFishingNote(FishingNote note, CancellationToken ct);
+        Task DeleteFishingNote(FishingNote note, CancellationToken ct);
+        Task UpdateFishingNote(FishingNote note, CancellationToken ct);
     }
 }

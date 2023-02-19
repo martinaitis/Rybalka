@@ -7,6 +7,7 @@ namespace Rybalka.Core.Interfaces.Clients
         public Task<HourWeatherForecastDto?> GetHourWeatherForecast(
             double latitude,
             double longitude,
-            DateTime time);
+            DateTime time,
+            CancellationToken ct);
     }
 }

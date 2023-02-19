@@ -22,28 +22,28 @@ namespace Rybalka.Core.Services
             _weatherForecastClient = weatherForecastClient;
         }
 
-        public async Task<List<FishingNoteDto>> GetAllFishingNotes()
+        public async Task<List<FishingNoteDto>> GetAllFishingNotes(CancellationToken ct)
         {
-            var notes = await _fishingNoteRepository.GetFishingNotesReadOnly();
+            var notes = await _fishingNoteRepository.GetFishingNotesReadOnly(ct);
 
             return _mapper.Map<List<FishingNoteDto>>(notes);
         }
 
-        public async Task<FishingNoteDto?> GetFishingNoteById(int id)
+        public async Task<FishingNoteDto?> GetFishingNoteById(int id, CancellationToken ct)
         {
-            var note = await _fishingNoteRepository.GetFishingNoteByIdReadOnly(id);
+            var note = await _fishingNoteRepository.GetFishingNoteByIdReadOnly(id, ct);
 
             return _mapper.Map<FishingNoteDto>(note) ?? null;
         }
 
-        public async Task<List<FishingNoteDto>> GetFishingNotesByUser(string user)
+        public async Task<List<FishingNoteDto>> GetFishingNotesByUser(string user, CancellationToken ct)
         {
-            var notes = await _fishingNoteRepository.GetFishingNotesByUserReadOnly(user);
+            var notes = await _fishingNoteRepository.GetFishingNotesByUserReadOnly(user, ct);
 
             return _mapper.Map<List<FishingNoteDto>>(notes);
         }
 
-        public async Task<FishingNoteDto> CreateFishingNote(FishingNoteDto noteDto)
+        public async Task<FishingNoteDto> CreateFishingNote(FishingNoteDto noteDto, CancellationToken ct)
         {
             if (noteDto.Coordinates != null
                 && noteDto.Coordinates.Latitude != null
@@ -52,7 +52,8 @@ namespace Rybalka.Core.Services
                 var forecast = await _weatherForecastClient.GetHourWeatherForecast(
                 (double)noteDto.Coordinates.Latitude,
                 (double)noteDto.Coordinates.Longitude,
-                noteDto.StartTime);
+                noteDto.StartTime,
+                ct);
 
                 if (forecast != null)
                 {
@@ -65,34 +66,34 @@ namespace Rybalka.Core.Services
             }
 
             var note = _mapper.Map<FishingNote>(noteDto);
-            await _fishingNoteRepository.CreateFishingNote(note);
+            await _fishingNoteRepository.CreateFishingNote(note, ct);
 
             return noteDto;
         }
 
-        public async Task<bool> DeleteFishingNote(int id)
+        public async Task<bool> DeleteFishingNote(int id, CancellationToken ct)
         {
-            var note = await _fishingNoteRepository.GetFishingNoteById(id);
+            var note = await _fishingNoteRepository.GetFishingNoteById(id, ct);
             if (note == null)
             {
                 return false;
             }
             
-            await _fishingNoteRepository.DeleteFishingNote(note);
+            await _fishingNoteRepository.DeleteFishingNote(note, ct);
 
             return true;
         }
 
-        public async Task<bool> UpdateFishingNote(FishingNoteDto noteDto)
+        public async Task<bool> UpdateFishingNote(FishingNoteDto noteDto, CancellationToken ct)
         {
-            var note = await _fishingNoteRepository.GetFishingNoteById(noteDto.Id);
+            var note = await _fishingNoteRepository.GetFishingNoteById(noteDto.Id, ct);
             if (note == null)
             {
                 return false;
             }
 
             _mapper.Map(noteDto, note);
-            await _fishingNoteRepository.UpdateFishingNote(note);
+            await _fishingNoteRepository.UpdateFishingNote(note, ct);
 
             return true;
         }

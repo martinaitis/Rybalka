@@ -12,30 +12,30 @@ namespace Rybalka.Infrastructure.Repositories
         {
             _db = db;
         }
-        public async Task<List<User>> GetUsersReadOnly()
+        public async Task<List<User>> GetUsersReadOnly(CancellationToken ct)
         {
-            return await _db.Users.AsNoTracking().ToListAsync();
+            return await _db.Users.AsNoTracking().ToListAsync(ct);
         }
 
-        public async Task<User?> GetUserById(int id)
+        public async Task<User?> GetUserById(int id, CancellationToken ct)
         {
-            return await _db.Users.FirstOrDefaultAsync(n => n.Id == id);
+            return await _db.Users.FirstOrDefaultAsync(n => n.Id == id, ct);
         }
-        public async Task<User?> GetUserByIdReadOnly(int id)
+        public async Task<User?> GetUserByIdReadOnly(int id, CancellationToken ct)
         {
-            return await _db.Users.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id);
+            return await _db.Users.AsNoTracking().FirstOrDefaultAsync(n => n.Id == id, ct);
         }
 
-        public async Task CreateUser(User user)
+        public async Task CreateUser(User user, CancellationToken ct)
         {
             _db.Users.Add(user);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
         }
 
-        public async Task DeleteUser(User user)
+        public async Task DeleteUser(User user, CancellationToken ct)
         {
             _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(ct);
         }
     }
 }

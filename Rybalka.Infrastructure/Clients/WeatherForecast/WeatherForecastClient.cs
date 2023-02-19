@@ -32,7 +32,8 @@ namespace Rybalka.Infrastructure.Clients.WeatherForecast
         public async Task<HourWeatherForecastDto?> GetHourWeatherForecast(
             double latitude,
             double longitude,
-            DateTime time)
+            DateTime time,
+            CancellationToken ct)
         {
             if (DateTime.Compare(time, DateTime.Now.AddDays(-7)) < 0)
             {
@@ -48,8 +49,11 @@ namespace Rybalka.Infrastructure.Clients.WeatherForecast
                 query["dt"] = $"{time.Year}-{time.Month}-{time.Day}";
                 query["hour"] = time.Hour.ToString();
 
-                var forecastResponse = await _httpClient.GetFromJsonAsync<WeatherForecastResponse>(query.ToString());
-                var forecastDto = _mapper.Map<HourWeatherForecastDto>(forecastResponse?.Forecast?.ForecastDay?[0].Hour?[0]);
+                var forecastResponse = await _httpClient
+                    .GetFromJsonAsync<WeatherForecastResponse>(query.ToString(), ct);
+
+                var forecastDto = _mapper.Map<HourWeatherForecastDto>(
+                    forecastResponse?.Forecast?.ForecastDay?[0].Hour?[0]);
 
                 return forecastDto;
             }
