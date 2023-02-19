@@ -24,9 +24,9 @@ namespace RybalkaWebAPI.Attributes
             var responseCode = resultExecutedContext.HttpContext.Response.StatusCode;
 
             _logger.LogInformation(
-                "RESPONSE CODE: {responseTo} RESPONSE TO: {responseCode}",
-                responseTo,
-                responseCode);
+                "RESPONSE CODE: {responseCode} RESPONSE TO: {responseTo}",
+                responseCode,
+                responseTo);
         }
     }
 }
