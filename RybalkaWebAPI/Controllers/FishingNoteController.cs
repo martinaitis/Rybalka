@@ -9,6 +9,8 @@ namespace RybalkaWebAPI.Controllers
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/note")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class FishingNoteController : ControllerBase
     {
         private const string GET_ROUTE_NAME = "GetNotes";
@@ -24,7 +26,7 @@ namespace RybalkaWebAPI.Controllers
         /// Use default parameters to get all fishing notes.
         /// For filtering use only one parameter, parameters can not be combined.
         /// </remarks>
-        [HttpGet(Name = GET_ROUTE_NAME)]
+        [HttpGet(Name = GET_ROUTE_NAME), MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<FishingNoteDto>>> GetNotes(
@@ -50,25 +52,73 @@ namespace RybalkaWebAPI.Controllers
             }
         }
 
-        [HttpPost]
+        /// <remarks>
+        /// Use default parameters to get all fishing notes.
+        /// For filtering use only one parameter, parameters can not be combined.
+        /// </remarks>
+        [HttpGet(Name = GET_ROUTE_NAME), MapToApiVersion("2.0")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<FishingNoteResponse>>> GetNotesV2(
+            CancellationToken ct,
+            int id = 0,
+            string user = "")
+        {
+            if (id != 0 && !user.IsNullOrEmpty())
+            {
+                return BadRequest("Use one filter parameter");
+            }
+            else if (id != 0)
+            {
+                return await GetNoteByIdV2(id, ct);
+            }
+            else if (!user.IsNullOrEmpty())
+            {
+                return await GetNotesByUserV2(user, ct);
+            }
+            else
+            {
+                return await GetAllNotesV2(ct);
+            }
+        }
+
+        [HttpPost, MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<FishingNoteDto>> PostNote(
-            [FromBody] FishingNoteDto noteDto,
+            [FromBody] FishingNoteDto note,
             CancellationToken ct)
         {
-            if (noteDto == null)
+            if (note == null)
             {
                 return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
             }
             else
             {
-                var createdNoteDto = await _fishingNoteService.CreateFishingNote(noteDto, ct);
-                return CreatedAtAction(nameof(GetNotes), new { id = createdNoteDto.Id }, createdNoteDto);
+                var createdNote = await _fishingNoteService.CreateFishingNote(note, ct);
+                return CreatedAtAction(nameof(GetNotes), new { id = createdNote.Id }, createdNote);
             }
         }
 
-        [HttpDelete]
+        [HttpPost, MapToApiVersion("2.0")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<FishingNoteRequest>> PostNoteV2(
+            [FromForm] FishingNoteRequest noteRequest,
+            CancellationToken ct)
+        {
+            if (noteRequest == null)
+            {
+                return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
+            }
+            else
+            {
+                var noteResponse = await _fishingNoteService.CreateFishingNoteV2(noteRequest, ct);
+                return CreatedAtAction(nameof(GetNotes), new { id = noteResponse.Id }, noteResponse);
+            }
+        }
+
+        [HttpDelete, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteNote(int id, CancellationToken ct)
@@ -81,7 +131,7 @@ namespace RybalkaWebAPI.Controllers
             return NotFound($"Fishing note with id:{id} does not exist in DB");
         }
 
-        [HttpPut]
+        [HttpPut, MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,9 +150,42 @@ namespace RybalkaWebAPI.Controllers
             return NotFound($"Fishing note with id:{noteDto.Id} does not exist in DB");
         }
 
+        [HttpPut, MapToApiVersion("2.0")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateNoteV2(
+            [FromBody] FishingNoteRequest noteRequest,
+            int id,
+            CancellationToken ct)
+        {
+            if (noteRequest == null)
+            {
+                return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
+            }
+
+            if (await _fishingNoteService.UpdateFishingNoteV2(noteRequest, id, ct))
+            {
+                return NoContent();
+            }
+
+            return NotFound($"Fishing note with id:{id} does not exist in DB");
+        }
+
         private async Task<ActionResult<List<FishingNoteDto>>> GetAllNotes(CancellationToken ct)
         {
             var notes = await _fishingNoteService.GetAllFishingNotes(ct);
+            if (notes.Any())
+            {
+                return Ok(notes.OrderByDescending(n => n.StartTime));
+            }
+
+            return NoContent();
+        }
+
+        private async Task<ActionResult<List<FishingNoteResponse>>> GetAllNotesV2(CancellationToken ct)
+        {
+            var notes = await _fishingNoteService.GetAllFishingNotesV2(ct);
             if (notes.Any())
             {
                 return Ok(notes.OrderByDescending(n => n.StartTime));
@@ -122,9 +205,31 @@ namespace RybalkaWebAPI.Controllers
             return Ok(note);
         }
 
+        private async Task<ActionResult<List<FishingNoteResponse>>> GetNoteByIdV2(int id, CancellationToken ct)
+        {
+            var note = await _fishingNoteService.GetFishingNoteByIdV2(id, ct);
+            if (note == null)
+            {
+                return NotFound($"Fishing note with id:{id} does not exist in DB");
+            }
+
+            return Ok(note);
+        }
+
         private async Task<ActionResult<List<FishingNoteDto>>> GetNotesByUser(string user, CancellationToken ct)
         {
             var notes = await _fishingNoteService.GetFishingNotesByUser(user, ct);
+            if (notes.Any())
+            {
+                return Ok(notes.OrderByDescending(n => n.StartTime));
+            }
+
+            return NoContent();
+        }
+
+        private async Task<ActionResult<List<FishingNoteResponse>>> GetNotesByUserV2(string user, CancellationToken ct)
+        {
+            var notes = await _fishingNoteService.GetFishingNotesByUserV2(user, ct);
             if (notes.Any())
             {
                 return Ok(notes.OrderByDescending(n => n.StartTime));

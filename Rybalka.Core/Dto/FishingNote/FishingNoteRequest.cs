@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Rybalka.Core.Dto.FishingNote
 {
-    public sealed class FishingNoteDto
+    public sealed class FishingNoteRequest
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(15)]
         [MinLength(4)]

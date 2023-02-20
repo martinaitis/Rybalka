@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Rybalka.Core.AutoMapper;
@@ -11,9 +14,11 @@ using Rybalka.Infrastructure.AutoMapper;
 using Rybalka.Infrastructure.Clients.WeatherForecast;
 using Rybalka.Infrastructure.Data;
 using Rybalka.Infrastructure.Repositories;
+using RybalkaWebAPI;
 using RybalkaWebAPI.Attributes;
 using Serilog;
 using Serilog.Events;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,24 +80,49 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
         options.SerializerSettings.Converters.Add(new StringEnumConverter()));
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfigureOptions>();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1",
-        new OpenApiInfo
-        {
-            Title = "RybalkaWebAPI - V1",
-            Version = "v1"
-        }
-     );
-
     var filePath = Path.Combine(AppContext.BaseDirectory, "RybalkaWebAPI.xml");
     c.IncludeXmlComments(filePath);
 });
+builder.Services.AddApiVersioning(o =>
+{
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    o.ReportApiVersions = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("X-Version"),
+        new MediaTypeApiVersionReader("ver"));
+});
+builder.Services.AddVersionedApiExplorer(
+    options =>
+    {
+        options.GroupNameFormat = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger(options =>
+{
+    options.PreSerializeFilters.Add((swagger, req) =>
+    {
+        swagger.Servers = new List<OpenApiServer>() { new OpenApiServer() { Url = $"https://{req.Host}" } };
+    });
+});
+
+var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+app.UseSwaggerUI(options =>
+{
+    foreach (var desc in provider.ApiVersionDescriptions)
+    {
+        options.SwaggerEndpoint($"../swagger/{desc.GroupName}/swagger.json", desc.ApiVersion.ToString());
+        options.DefaultModelsExpandDepth(-1);
+        options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    }
+});
 
 app.UseHttpsRedirection();
 
@@ -105,5 +135,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.Run();

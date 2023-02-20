@@ -32,5 +32,6 @@ namespace Rybalka.Core.Entities
         [Precision(6, 2)]
         public decimal? CloudPct { get; set; }
         public string? ConditionText { get; set; }
+        public string? ImageFileName { get; set; }
     }
 }
