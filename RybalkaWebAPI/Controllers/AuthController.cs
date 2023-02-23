@@ -2,7 +2,7 @@
 using Rybalka.Core.Dto;
 using Rybalka.Core.Dto.Auth;
 using Rybalka.Core.Interfaces.Services;
-using RybalkaWebAPI.Attributes;
+using RybalkaWebAPI.Attributes.Action;
 
 namespace RybalkaWebAPI.Controllers
 {

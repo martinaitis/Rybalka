@@ -14,8 +14,8 @@ using Rybalka.Infrastructure.AutoMapper;
 using Rybalka.Infrastructure.Clients.WeatherForecast;
 using Rybalka.Infrastructure.Data;
 using Rybalka.Infrastructure.Repositories;
-using RybalkaWebAPI;
-using RybalkaWebAPI.Attributes;
+using RybalkaWebAPI.Attributes.Action;
+using RybalkaWebAPI.Configs;
 using Serilog;
 using Serilog.Events;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -67,6 +67,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpClient<IWeatherForecastClient, WeatherForecastClient>();
 
 builder.Services.AddScoped<LogAttribute>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFishingNoteService, FishingNoteService>();
 builder.Services.AddScoped<IFishingNoteRepository, FishingNoteRepository>();

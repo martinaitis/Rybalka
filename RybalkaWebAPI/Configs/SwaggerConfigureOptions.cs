@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace RybalkaWebAPI
+namespace RybalkaWebAPI.Configs
 {
     public class SwaggerConfigureOptions : IConfigureOptions<SwaggerGenOptions>
     {

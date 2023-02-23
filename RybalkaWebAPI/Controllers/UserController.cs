@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Rybalka.Core.Dto.User;
 using Rybalka.Core.Interfaces.Services;
-using RybalkaWebAPI.Attributes;
+using RybalkaWebAPI.Attributes.Action;
 
 namespace RybalkaWebAPI.Controllers
 {

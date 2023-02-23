@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace RybalkaWebAPI.Attributes
+namespace RybalkaWebAPI.Attributes.Action
 {
     public class LogAttribute : ActionFilterAttribute
     {

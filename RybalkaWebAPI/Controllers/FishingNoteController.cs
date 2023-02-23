@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Rybalka.Core.Dto.FishingNote;
 using Rybalka.Core.Interfaces.Services;
-using RybalkaWebAPI.Attributes;
+using RybalkaWebAPI.Attributes.Action;
 
 namespace RybalkaWebAPI.Controllers
 {
@@ -14,6 +14,7 @@ namespace RybalkaWebAPI.Controllers
     public class FishingNoteController : ControllerBase
     {
         private const string GET_ROUTE_NAME = "GetNotes";
+        private const int MAX_IMAGE_SIZE_BYTE = 10 * 1024 * 1024; //10MB
 
         private readonly IFishingNoteService _fishingNoteService;
 
@@ -103,7 +104,7 @@ namespace RybalkaWebAPI.Controllers
         [HttpPost, MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<FishingNoteRequest>> PostNoteV2(
+        public async Task<ActionResult<FishingNoteResponse>> PostNoteV2(
             [FromForm] FishingNoteRequest noteRequest,
             CancellationToken ct)
         {
@@ -111,6 +112,7 @@ namespace RybalkaWebAPI.Controllers
             {
                 return BadRequest($"Request body does not contains {nameof(FishingNoteDto)}");
             }
+
             else
             {
                 var noteResponse = await _fishingNoteService.CreateFishingNoteV2(noteRequest, ct);
@@ -227,7 +229,9 @@ namespace RybalkaWebAPI.Controllers
             return NoContent();
         }
 
-        private async Task<ActionResult<List<FishingNoteResponse>>> GetNotesByUserV2(string user, CancellationToken ct)
+        private async Task<ActionResult<List<FishingNoteResponse>>> GetNotesByUserV2(
+            string user,
+            CancellationToken ct)
         {
             var notes = await _fishingNoteService.GetFishingNotesByUserV2(user, ct);
             if (notes.Any())

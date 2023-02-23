@@ -67,9 +67,7 @@ namespace Rybalka.Core.Services
 
         public async Task<FishingNoteDto> CreateFishingNote(FishingNoteDto noteDto, CancellationToken ct)
         {
-            if (noteDto.Coordinates != null
-                && noteDto.Coordinates.Latitude != null
-                && noteDto.Coordinates.Longitude != null)
+            if (noteDto.Coordinates != null)
             {
                 var forecast = await _weatherForecastClient.GetHourWeatherForecast(
                 (double)noteDto.Coordinates.Latitude,
@@ -98,24 +96,19 @@ namespace Rybalka.Core.Services
             FishingNoteRequest noteRequest,
             CancellationToken ct)
         {
-            if (noteRequest.Coordinates != null
-                && noteRequest.Coordinates.Latitude != null
-                && noteRequest.Coordinates.Longitude != null)
-            {
-                var forecast = await _weatherForecastClient.GetHourWeatherForecast(
-                (double)noteRequest.Coordinates.Latitude,
-                (double)noteRequest.Coordinates.Longitude,
+            var forecast = await _weatherForecastClient.GetHourWeatherForecast(
+                noteRequest.Coordinates.Latitude,
+                noteRequest.Coordinates.Longitude,
                 noteRequest.StartTime,
                 ct);
 
-                if (forecast != null)
-                {
-                    noteRequest.Temp = forecast.Temp;
-                    noteRequest.WindKph = forecast.WindKph;
-                    noteRequest.WindDir = forecast.WindDir;
-                    noteRequest.CloudPct = forecast.CloudPct;
-                    noteRequest.ConditionText = forecast.Condition?.Text;
-                }
+            if (forecast != null)
+            {
+                noteRequest.Temp = forecast.Temp;
+                noteRequest.WindKph = forecast.WindKph;
+                noteRequest.WindDir = forecast.WindDir;
+                noteRequest.CloudPct = forecast.CloudPct;
+                noteRequest.ConditionText = forecast.Condition?.Text;
             }
 
             var note = _mapper.Map<FishingNote>(noteRequest);
