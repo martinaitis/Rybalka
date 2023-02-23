@@ -18,6 +18,6 @@
         public string? WindDir { get; set; }
         public decimal? CloudPct { get; set; }
         public string? ConditionText { get; set; }
-        public string? ImageFileName { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }
