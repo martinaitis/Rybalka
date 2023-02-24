@@ -26,7 +26,7 @@ namespace Rybalka.Core.Dto.FishingNote
         public string? Bait { get; set; }
         public string? Description { get; set; }
         public decimal? Temp { get; set; }
-        public decimal? WindKph { get; set; }
+        public decimal? WindMps { get; set; }
         public string? WindDir { get; set; }
         public decimal? CloudPct { get; set; }
         public string? ConditionText { get; set; }

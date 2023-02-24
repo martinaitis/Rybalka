@@ -105,7 +105,11 @@ namespace Rybalka.Core.Services
             if (forecast != null)
             {
                 noteRequest.Temp = forecast.Temp;
-                noteRequest.WindKph = forecast.WindKph;
+                if (forecast.WindKph != null)
+                {
+                    noteRequest.WindMps = decimal.Divide((decimal)forecast.WindKph, (decimal)3.6);
+                }
+                
                 noteRequest.WindDir = forecast.WindDir;
                 noteRequest.CloudPct = forecast.CloudPct;
                 noteRequest.ConditionText = forecast.Condition?.Text;

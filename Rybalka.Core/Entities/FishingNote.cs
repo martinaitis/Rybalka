@@ -26,7 +26,7 @@ namespace Rybalka.Core.Entities
         public decimal? Temp { get; set; }
 
         [Precision(6, 2)]
-        public decimal? WindKph { get; set; }
+        public decimal? WindMps { get; set; }
         public string? WindDir { get; set; }
 
         [Precision(6, 2)]
