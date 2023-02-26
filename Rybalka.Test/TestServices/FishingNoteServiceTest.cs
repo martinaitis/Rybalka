@@ -17,12 +17,12 @@ namespace Rybalka.Test.TestServices
             var fishingNoteRepositoryMock = new Mock<IFishingNoteRepository>();
             fishingNoteRepositoryMock.Setup(m => m.GetFishingNotesReadOnly(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes);
-            var fishingNoteServiceMock = new FishingNoteService(
+            var fishingNoteService = new FishingNoteService(
                 GetFishingNoteMapper(),
                 fishingNoteRepositoryMock.Object,
                 new Mock<IWeatherForecastClient>().Object);
             
-            var result = await fishingNoteServiceMock.GetAllFishingNotesV2(CancellationToken.None);
+            var result = await fishingNoteService.GetAllFishingNotesV2(CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.Equal(MockFishingNoteTable.fishingNotes.Count, result.Count);
@@ -35,12 +35,12 @@ namespace Rybalka.Test.TestServices
             fishingNoteRepositoryMock
                 .Setup(m => m.GetFishingNoteByIdReadOnly(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes.First());
-            var fishingNoteServiceMock = new FishingNoteService(
+            var fishingNoteService = new FishingNoteService(
                GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteServiceMock.GetFishingNoteByIdV2(1, CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNoteByIdV2(1, CancellationToken.None);
 
             Assert.NotNull(result);
         }
@@ -52,12 +52,12 @@ namespace Rybalka.Test.TestServices
             fishingNoteRepositoryMock
                 .Setup(m => m.GetFishingNoteByIdReadOnly(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => null);
-            var fishingNoteServiceMock = new FishingNoteService(
+            var fishingNoteService = new FishingNoteService(
                GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteServiceMock.GetFishingNoteByIdV2(1, CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNoteByIdV2(1, CancellationToken.None);
 
             Assert.Null(result);
         }
@@ -69,12 +69,12 @@ namespace Rybalka.Test.TestServices
             fishingNoteRepositoryMock
                 .Setup(m => m.GetFishingNotesByUserReadOnly("Karolis", It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes.GetRange(0, 1));
-            var fishingNoteServiceMock = new FishingNoteService(
+            var fishingNoteService = new FishingNoteService(
                GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteServiceMock.GetFishingNotesByUserV2("Karolis", CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNotesByUserV2("Karolis", CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.NotEmpty(result);
@@ -87,12 +87,12 @@ namespace Rybalka.Test.TestServices
             fishingNoteRepositoryMock
                 .Setup(m => m.GetFishingNotesByUserReadOnly(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNote>());
-            var fishingNoteServiceMock = new FishingNoteService(
+            var fishingNoteService = new FishingNoteService(
                GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteServiceMock.GetFishingNotesByUserV2("", CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNotesByUserV2("", CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.Empty(result);
