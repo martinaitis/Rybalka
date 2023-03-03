@@ -8,6 +8,7 @@ namespace RybalkaWebAPI.Controllers
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/auth")]
     [ApiController]
+    [ApiVersion("2.0")]
     public sealed class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

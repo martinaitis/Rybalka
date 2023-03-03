@@ -48,7 +48,8 @@ namespace Rybalka.Core.Services
         {
             List<Claim> claims = new()
             {
-                new Claim(ClaimTypes.Name, login.Username)
+                new Claim(ClaimTypes.Name, login.Username),
+                new Claim(ClaimTypes.Role, "User")
             };
 
             var symmetricSecurityKey = Environment.GetEnvironmentVariable("SYMMETRIC_SECURITY_KEY");

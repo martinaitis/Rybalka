@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Rybalka.Core.Dto.FishingNote;
 using Rybalka.Core.Interfaces.Services;
@@ -57,7 +58,7 @@ namespace RybalkaWebAPI.Controllers
         /// Use default parameters to get all fishing notes.
         /// For filtering use only one parameter, parameters can not be combined.
         /// </remarks>
-        [HttpGet(Name = GET_ROUTE_NAME), MapToApiVersion("2.0")]
+        [HttpGet(Name = GET_ROUTE_NAME), MapToApiVersion("2.0"), Authorize(Roles = "User")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<List<FishingNoteResponse>>> GetNotesV2(
@@ -101,7 +102,7 @@ namespace RybalkaWebAPI.Controllers
             }
         }
 
-        [HttpPost, MapToApiVersion("2.0")]
+        [HttpPost, MapToApiVersion("2.0"), Authorize(Roles = "User")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<FishingNoteResponse>> PostNoteV2(
@@ -120,10 +121,23 @@ namespace RybalkaWebAPI.Controllers
             }
         }
 
-        [HttpDelete, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
+        [HttpDelete, MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteNote(int id, CancellationToken ct)
+        {
+            if (await _fishingNoteService.DeleteFishingNote(id, ct))
+            {
+                return NoContent();
+            }
+
+            return NotFound($"Fishing note with id:{id} does not exist in DB");
+        }
+
+        [HttpDelete, MapToApiVersion("2.0"), Authorize(Roles = "User")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteNoteV2(int id, CancellationToken ct)
         {
             if (await _fishingNoteService.DeleteFishingNote(id, ct))
             {
@@ -152,7 +166,7 @@ namespace RybalkaWebAPI.Controllers
             return NotFound($"Fishing note with id:{noteDto.Id} does not exist in DB");
         }
 
-        [HttpPut, MapToApiVersion("2.0")]
+        [HttpPut, MapToApiVersion("2.0"), Authorize(Roles = "User")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
