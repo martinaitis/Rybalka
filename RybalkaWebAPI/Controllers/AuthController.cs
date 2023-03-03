@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rybalka.Core.Dto;
 using Rybalka.Core.Dto.Auth;
 using Rybalka.Core.Interfaces.Services;
 using RybalkaWebAPI.Attributes.Action;
@@ -16,21 +15,34 @@ namespace RybalkaWebAPI.Controllers
         {
             _authService = authService;
         }
-/*
+
         [Route("register")]
-        [HttpPost]
+        [HttpPost, MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ServiceResponseDto>> Register([FromBody] RegisterDto registerDto)
+        public async Task<ActionResult> Register(
+            [FromBody] RegisterDto registerDto,
+            CancellationToken ct)
         {
+            await _authService.Register(registerDto, ct);
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         [Route("login")]
-        [HttpPost]
+        [HttpPost, MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto, CancellationToken ct)
         {
-        }*/
+            var login = await _authService.Login(loginDto, ct);
+            if (!login.IsSuccess)
+            {
+                return StatusCode(login.StatusCode, login.ErrorMessage);
+            }
+
+            var jwt = _authService.CreateToken(loginDto);
+
+            return Ok(jwt);
+        }
     }
 }

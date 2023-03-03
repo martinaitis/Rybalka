@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +59,8 @@ builder.Services.AddHttpClient<IWeatherForecastClient, WeatherForecastClient>();
 
 builder.Services.AddScoped<LogAttribute>();
 
-/*builder.Services.AddScoped<IAuthService, AuthService>();*/
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IFishingNoteService, FishingNoteService>();
 builder.Services.AddScoped<IFishingNoteRepository, FishingNoteRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

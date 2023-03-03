@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Rybalka.Core.Dto.User;
 using Rybalka.Core.Interfaces.Services;
 using RybalkaWebAPI.Attributes.Action;
 
 namespace RybalkaWebAPI.Controllers
 {
+    [Obsolete("Auth controller should replace User")]
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/user")]
     [ApiController]

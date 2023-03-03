@@ -5,7 +5,9 @@ namespace Rybalka.Core.Interfaces.Services
 {
     public interface IAuthService
     {
-/*        Task<bool> Login(LoginDto login);
-        Task<ServiceResponseDto> Register(RegisterDto register);*/
+        Task<ServiceResponseDto> Login(LoginDto login, CancellationToken ct);
+        Task Register(RegisterDto register, CancellationToken ct);
+
+        string CreateToken(LoginDto login);
     }
 }
