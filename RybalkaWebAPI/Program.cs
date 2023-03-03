@@ -44,14 +44,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RybalkaApiConnection"));
 });
 
-builder.Services.AddDbContext<AuthDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RybalkaApiConnection"));
-});
-
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<AuthDbContext>();
-
 const string CORS_POLICY_ALL_ORIGINS = "AllOrigins";
 builder.Services.AddCors(options =>
 {
@@ -68,7 +60,7 @@ builder.Services.AddHttpClient<IWeatherForecastClient, WeatherForecastClient>();
 
 builder.Services.AddScoped<LogAttribute>();
 
-builder.Services.AddScoped<IAuthService, AuthService>();
+/*builder.Services.AddScoped<IAuthService, AuthService>();*/
 builder.Services.AddScoped<IFishingNoteService, FishingNoteService>();
 builder.Services.AddScoped<IFishingNoteRepository, FishingNoteRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
