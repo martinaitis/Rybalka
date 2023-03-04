@@ -7,7 +7,5 @@ namespace Rybalka.Core.Interfaces.Services
     {
         Task<ServiceResponseDto> Login(LoginDto login, CancellationToken ct);
         Task Register(RegisterDto register, CancellationToken ct);
-
-        string CreateToken(LoginDto login);
     }
 }

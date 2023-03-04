@@ -41,9 +41,7 @@ namespace RybalkaWebAPI.Controllers
                 return StatusCode(login.StatusCode, login.ErrorMessage);
             }
 
-            var jwt = _authService.CreateToken(loginDto);
-
-            return Ok(jwt);
+            return Ok(login.Result);
         }
     }
 }

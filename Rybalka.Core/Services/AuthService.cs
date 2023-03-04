@@ -41,14 +41,19 @@ namespace Rybalka.Core.Services
                 };
             }
 
-            return new ServiceResponseDto();
+            var jwt = CreateToken(user.Username);
+            var response = new ServiceResponseDto();
+            response.Result.Add("userId", user.Id.ToString());
+            response.Result.Add("jwt", jwt);
+
+            return response;
         }
 
-        public string CreateToken(LoginDto login)
+        private string CreateToken(string username)
         {
             List<Claim> claims = new()
             {
-                new Claim(ClaimTypes.Name, login.Username),
+                new Claim(ClaimTypes.Name, username),
                 new Claim(ClaimTypes.Role, "User")
             };
 

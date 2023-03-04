@@ -6,10 +6,11 @@ using RybalkaWebAPI.Attributes.Action;
 
 namespace RybalkaWebAPI.Controllers
 {
-    [Obsolete("Auth controller should replace User")]
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/user")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -26,7 +27,7 @@ namespace RybalkaWebAPI.Controllers
         /// <remarks>
         /// Return all users list.
         /// </remarks>
-        [HttpGet]
+        [HttpGet, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<string>>> GetUsers(CancellationToken ct)
@@ -39,8 +40,8 @@ namespace RybalkaWebAPI.Controllers
 
             return NoContent();
         }
-
-        [HttpPost]
+        [Obsolete("Use Auth controler Register endpoint.")]
+        [HttpPost, MapToApiVersion("1.0")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostUser([FromBody] UserDto userDto, CancellationToken ct)
@@ -55,7 +56,7 @@ namespace RybalkaWebAPI.Controllers
             return StatusCode(StatusCodes.Status201Created);
         }
 
-        [HttpDelete]
+        [HttpDelete, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id, CancellationToken ct)
