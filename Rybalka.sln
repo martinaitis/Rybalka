@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rybalka.Infrastructure", "R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rybalka.Core", "Rybalka.Core\Rybalka.Core.csproj", "{EDD2C854-48CD-4A82-9C3B-94F386164BB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rybalka.Test", "Rybalka.Test\Rybalka.Test.csproj", "{2C684D0A-8BA0-4182-8C15-A1262CB681D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rybalka.Test", "Rybalka.Test\Rybalka.Test.csproj", "{2C684D0A-8BA0-4182-8C15-A1262CB681D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FF04DC2A-A68D-42F5-8487-7F7102CF9C20}"
+	ProjectSection(SolutionItems) = preProject
+		codecov.yml = codecov.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
