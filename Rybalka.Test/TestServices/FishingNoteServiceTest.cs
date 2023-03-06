@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using Moq;
-using Rybalka.Core.AutoMapper;
+﻿using Moq;
 using Rybalka.Core.Entities;
 using Rybalka.Core.Interfaces.Clients;
 using Rybalka.Core.Interfaces.Repositories;
 using Rybalka.Core.Services;
 using Rybalka.Test.Mocks.Database;
+using Rybalka.Test.Utils;
 
 namespace Rybalka.Test.TestServices
 {
@@ -18,7 +17,7 @@ namespace Rybalka.Test.TestServices
             fishingNoteRepositoryMock.Setup(m => m.GetFishingNotesReadOnly(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes);
             var fishingNoteService = new FishingNoteService(
-                GetFishingNoteMapper(),
+                Mappers.GetFishingNoteMapper(),
                 fishingNoteRepositoryMock.Object,
                 new Mock<IWeatherForecastClient>().Object);
             
@@ -36,7 +35,7 @@ namespace Rybalka.Test.TestServices
                 .Setup(m => m.GetFishingNoteByIdReadOnly(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes.First());
             var fishingNoteService = new FishingNoteService(
-               GetFishingNoteMapper(),
+               Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
@@ -53,7 +52,7 @@ namespace Rybalka.Test.TestServices
                 .Setup(m => m.GetFishingNoteByIdReadOnly(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => null);
             var fishingNoteService = new FishingNoteService(
-               GetFishingNoteMapper(),
+               Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
@@ -70,7 +69,7 @@ namespace Rybalka.Test.TestServices
                 .Setup(m => m.GetFishingNotesByUserReadOnly("Karolis", It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes.GetRange(0, 1));
             var fishingNoteService = new FishingNoteService(
-               GetFishingNoteMapper(),
+               Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
@@ -88,7 +87,7 @@ namespace Rybalka.Test.TestServices
                 .Setup(m => m.GetFishingNotesByUserReadOnly(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNote>());
             var fishingNoteService = new FishingNoteService(
-               GetFishingNoteMapper(),
+               Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
@@ -96,11 +95,6 @@ namespace Rybalka.Test.TestServices
 
             Assert.NotNull(result);
             Assert.Empty(result);
-        }
-
-        private static Mapper GetFishingNoteMapper()
-        {
-            return new(new MapperConfiguration(cfg => cfg.AddProfile(new FishingNoteProfile())));
         }
     }
 }

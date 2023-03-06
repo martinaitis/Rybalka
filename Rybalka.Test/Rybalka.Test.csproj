@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Rybalka.Core\Rybalka.Core.csproj" />
     <ProjectReference Include="..\Rybalka.Infrastructure\Rybalka.Infrastructure.csproj" />
+    <ProjectReference Include="..\RybalkaWebAPI\RybalkaWebAPI.csproj" />
   </ItemGroup>
 
 </Project>
