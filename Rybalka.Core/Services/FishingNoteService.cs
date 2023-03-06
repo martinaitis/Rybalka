@@ -69,10 +69,12 @@ namespace Rybalka.Core.Services
         {
             if (noteDto.Coordinates != null)
             {
+                var forecastTime = noteDto.StartTime.AddHours(
+                    (noteDto.EndTime - noteDto.StartTime).TotalHours / 2);
                 var forecast = await _weatherForecastClient.GetHourWeatherForecast(
                 (double)noteDto.Coordinates.Latitude,
                 (double)noteDto.Coordinates.Longitude,
-                noteDto.StartTime,
+                forecastTime,
                 ct);
 
                 if (forecast != null)
@@ -96,10 +98,12 @@ namespace Rybalka.Core.Services
             FishingNoteRequest noteRequest,
             CancellationToken ct)
         {
+            var forecastTime = noteRequest.StartTime.AddHours(
+                    (noteRequest.EndTime - noteRequest.StartTime).TotalHours / 2);
             var forecast = await _weatherForecastClient.GetHourWeatherForecast(
                 noteRequest.Coordinates.Latitude,
                 noteRequest.Coordinates.Longitude,
-                noteRequest.StartTime,
+                forecastTime,
                 ct);
 
             if (forecast != null)
