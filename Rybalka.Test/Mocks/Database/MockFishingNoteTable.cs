@@ -10,7 +10,7 @@ namespace Rybalka.Test.Mocks.Database
             new FishingNote
             {
                 Id = 1,
-                User = "Karolis",
+                Username = "Karolis",
                 Title = "Pavadinimas",
                 StartTime = new DateTime(2023, 2, 20, 10, 0, 0),
                 EndTime = new DateTime(2023, 2, 20, 12, 0, 0),
@@ -31,7 +31,7 @@ namespace Rybalka.Test.Mocks.Database
             new FishingNote
             {
                 Id = 2,
-                User = "Paulius",
+                Username = "Paulius",
                 Title = "Pavadinimas2",
                 StartTime = new DateTime(2023, 1, 20, 10, 0, 0),
                 EndTime = new DateTime(2023, 1, 20, 12, 0, 0),

@@ -75,7 +75,7 @@ namespace Rybalka.Test.TestRepositories
             Assert.NotNull(result);
             Assert.NotEmpty(result);
             Assert.Single(result);
-            Assert.True(result.All(n => n.User == "Karolis"));
+            Assert.True(result.All(n => n.Username == "Karolis"));
         }
 
         [Fact]

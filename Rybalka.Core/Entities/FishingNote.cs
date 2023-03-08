@@ -10,7 +10,7 @@ namespace Rybalka.Core.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public required string User { get; set; }
+        public required string Username { get; set; }
         public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
