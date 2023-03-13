@@ -8,7 +8,6 @@ namespace RybalkaWebAPI.Controllers
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/auth")]
     [ApiController]
-    [ApiVersion("2.0")]
     public sealed class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -18,7 +17,7 @@ namespace RybalkaWebAPI.Controllers
         }
 
         [Route("register")]
-        [HttpPost, MapToApiVersion("2.0")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> Register(
             [FromBody] RegisterDto registerDto,
@@ -29,7 +28,7 @@ namespace RybalkaWebAPI.Controllers
         }
 
         [Route("login")]
-        [HttpPost, MapToApiVersion("2.0")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

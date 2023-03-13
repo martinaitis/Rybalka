@@ -28,9 +28,9 @@ namespace Rybalka.Infrastructure.Repositories
             return await _db.FishingNotes.FirstOrDefaultAsync(n => n.Id == id, ct);
         }
 
-        public async Task<List<FishingNote>> GetFishingNotesByUserReadOnly(string user, CancellationToken ct)
+        public async Task<List<FishingNote>> GetFishingNotesByUserIdReadOnly(int userId, CancellationToken ct)
         {
-            return await _db.FishingNotes.AsNoTracking().Where(n => n.Username == user).ToListAsync(ct);
+            return await _db.FishingNotes.Where(n => n.UserId == userId).ToListAsync(ct);
         }
 
         public async Task CreateFishingNote(FishingNote note, CancellationToken ct)

@@ -20,8 +20,8 @@ namespace Rybalka.Test.TestServices
                 Mappers.GetFishingNoteMapper(),
                 fishingNoteRepositoryMock.Object,
                 new Mock<IWeatherForecastClient>().Object);
-            
-            var result = await fishingNoteService.GetAllFishingNotesV2(CancellationToken.None);
+
+            var result = await fishingNoteService.GetAllFishingNotes(CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.Equal(MockFishingNoteTable.fishingNotes.Count, result.Count);
@@ -39,7 +39,7 @@ namespace Rybalka.Test.TestServices
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteService.GetFishingNoteByIdV2(1, CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNoteById(1, CancellationToken.None);
 
             Assert.NotNull(result);
         }
@@ -56,7 +56,7 @@ namespace Rybalka.Test.TestServices
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteService.GetFishingNoteByIdV2(1, CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNoteById(1, CancellationToken.None);
 
             Assert.Null(result);
         }
@@ -66,14 +66,14 @@ namespace Rybalka.Test.TestServices
         {
             var fishingNoteRepositoryMock = new Mock<IFishingNoteRepository>();
             fishingNoteRepositoryMock
-                .Setup(m => m.GetFishingNotesByUserReadOnly("Karolis", It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetFishingNotesByUserIdReadOnly(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => MockFishingNoteTable.fishingNotes.GetRange(0, 1));
             var fishingNoteService = new FishingNoteService(
                Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteService.GetFishingNotesByUserV2("Karolis", CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNotesByUserId(1, CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.NotEmpty(result);
@@ -84,14 +84,14 @@ namespace Rybalka.Test.TestServices
         {
             var fishingNoteRepositoryMock = new Mock<IFishingNoteRepository>();
             fishingNoteRepositoryMock
-                .Setup(m => m.GetFishingNotesByUserReadOnly(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Setup(m => m.GetFishingNotesByUserIdReadOnly(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNote>());
             var fishingNoteService = new FishingNoteService(
                Mappers.GetFishingNoteMapper(),
                fishingNoteRepositoryMock.Object,
                new Mock<IWeatherForecastClient>().Object);
 
-            var result = await fishingNoteService.GetFishingNotesByUserV2("", CancellationToken.None);
+            var result = await fishingNoteService.GetFishingNotesByUserId(99, CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.Empty(result);

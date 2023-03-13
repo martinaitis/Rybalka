@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Rybalka.Core.Dto.User;
 using Rybalka.Core.Interfaces.Services;
 using RybalkaWebAPI.Attributes.Action;
 
@@ -9,25 +8,19 @@ namespace RybalkaWebAPI.Controllers
     [ServiceFilter(typeof(LogAttribute))]
     [Route("api/user")]
     [ApiController]
-    [ApiVersion("1.0")]
-    [ApiVersion("2.0")]
     public class UserController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IUserService _userService;
 
-        public UserController(
-            IMapper mapper,
-            IUserService userService)
+        public UserController(IUserService userService)
         {
-            _mapper = mapper;
             _userService = userService;
         }
 
         /// <remarks>
         /// Return all users list.
         /// </remarks>
-        [HttpGet, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<string>>> GetUsers(CancellationToken ct)
@@ -40,23 +33,8 @@ namespace RybalkaWebAPI.Controllers
 
             return NoContent();
         }
-        [Obsolete("Use Auth controler Register endpoint.")]
-        [HttpPost, MapToApiVersion("1.0")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> PostUser([FromBody] UserDto userDto, CancellationToken ct)
-        {
-            if (userDto == null)
-            {
-                return BadRequest($"Request body does not contains {nameof(UserDto)}");
-            }
 
-            await _userService.CreateUser(userDto, ct);
-
-            return StatusCode(StatusCodes.Status201Created);
-        }
-
-        [HttpDelete, MapToApiVersion("1.0"), MapToApiVersion("2.0")]
+        [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id, CancellationToken ct)

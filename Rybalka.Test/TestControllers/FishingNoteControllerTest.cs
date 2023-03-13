@@ -16,7 +16,7 @@ namespace Rybalka.Test.TestControllers
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None, 1, "Test");
+            var result = await controller.GetNotes(CancellationToken.None, 1, 1);
 
             Assert.IsType<BadRequestObjectResult>(result.Result);
         }
@@ -26,11 +26,11 @@ namespace Rybalka.Test.TestControllers
         {
             var mapper = Mappers.GetFishingNoteMapper();
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetFishingNoteByIdV2(1, It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetFishingNoteById(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => mapper.Map<FishingNoteResponse>(MockFishingNoteTable.fishingNotes.First()));
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None, id: 1);
+            var result = await controller.GetNotes(CancellationToken.None, id: 1);
 
             Assert.IsType<OkObjectResult>(result.Result);
         }
@@ -39,11 +39,11 @@ namespace Rybalka.Test.TestControllers
         public async void GetNotesV2_WhenIdNotExist_NotFoundReturn()
         {
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetFishingNoteByIdV2(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetFishingNoteById(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => null);
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None, id: 999);
+            var result = await controller.GetNotes(CancellationToken.None, id: 999);
 
             Assert.IsType<NotFoundObjectResult>(result.Result);
         }
@@ -53,14 +53,14 @@ namespace Rybalka.Test.TestControllers
         {
             var mapper = Mappers.GetFishingNoteMapper();
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetFishingNotesByUserV2("Karolis", It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetFishingNotesByUserId(1, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNoteResponse>()
                 {
                     mapper.Map<FishingNoteResponse>(MockFishingNoteTable.fishingNotes.First())
                 });
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None, user: "Karolis");
+            var result = await controller.GetNotes(CancellationToken.None, userId: 1);
 
             Assert.IsType<OkObjectResult>(result.Result);
         }
@@ -69,11 +69,11 @@ namespace Rybalka.Test.TestControllers
         public async void GetNotesV2_WhenUserOrNotesNotExist_NoContentReturn()
         {
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetFishingNotesByUserV2("NotExistingUser", It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetFishingNotesByUserId(99, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNoteResponse>());
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None, user: "NotExistingUser");
+            var result = await controller.GetNotes(CancellationToken.None, userId: 99);
 
             Assert.IsType<NoContentResult>(result.Result);
         }
@@ -83,11 +83,11 @@ namespace Rybalka.Test.TestControllers
         {
             var mapper = Mappers.GetFishingNoteMapper();
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetAllFishingNotesV2(It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetAllFishingNotes(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => mapper.Map<List<FishingNoteResponse>>(MockFishingNoteTable.fishingNotes));
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None);
+            var result = await controller.GetNotes(CancellationToken.None);
 
             Assert.IsType<OkObjectResult>(result.Result);
         }
@@ -96,11 +96,11 @@ namespace Rybalka.Test.TestControllers
         public async void GetNotesV2_WhenFiltersNotSetAndNotesNotExist_NoContentReturn()
         {
             var fishingNoteServiceMock = new Mock<IFishingNoteService>();
-            fishingNoteServiceMock.Setup(m => m.GetAllFishingNotesV2(It.IsAny<CancellationToken>()))
+            fishingNoteServiceMock.Setup(m => m.GetAllFishingNotes(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => new List<FishingNoteResponse>());
             var controller = new FishingNoteController(fishingNoteServiceMock.Object);
 
-            var result = await controller.GetNotesV2(CancellationToken.None);
+            var result = await controller.GetNotes(CancellationToken.None);
 
             Assert.IsType<NoContentResult>(result.Result);
         }

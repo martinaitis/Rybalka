@@ -10,7 +10,6 @@ namespace Rybalka.Core.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public required string Username { get; set; }
         public string? Title { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
@@ -33,5 +32,8 @@ namespace Rybalka.Core.Entities
         public decimal? CloudPct { get; set; }
         public string? ConditionText { get; set; }
         public string? ImageFileName { get; set; }
+
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }

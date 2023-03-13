@@ -23,78 +23,28 @@ namespace Rybalka.Core.Services
             _weatherForecastClient = weatherForecastClient;
         }
 
-        public async Task<List<FishingNoteDto>> GetAllFishingNotes(CancellationToken ct)
-        {
-            var notes = await _fishingNoteRepository.GetFishingNotesReadOnly(ct);
-
-            return _mapper.Map<List<FishingNoteDto>>(notes);
-        }
-
-        public async Task<List<FishingNoteResponse>> GetAllFishingNotesV2(CancellationToken ct)
+        public async Task<List<FishingNoteResponse>> GetAllFishingNotes(CancellationToken ct)
         {
             var notes = await _fishingNoteRepository.GetFishingNotesReadOnly(ct);
 
             return _mapper.Map<List<FishingNoteResponse>>(notes);
         }
 
-        public async Task<FishingNoteDto?> GetFishingNoteById(int id, CancellationToken ct)
-        {
-            var note = await _fishingNoteRepository.GetFishingNoteByIdReadOnly(id, ct);
-
-            return _mapper.Map<FishingNoteDto>(note) ?? null;
-        }
-
-        public async Task<FishingNoteResponse?> GetFishingNoteByIdV2(int id, CancellationToken ct)
+        public async Task<FishingNoteResponse?> GetFishingNoteById(int id, CancellationToken ct)
         {
             var note = await _fishingNoteRepository.GetFishingNoteByIdReadOnly(id, ct);
 
             return _mapper.Map<FishingNoteResponse>(note) ?? null;
         }
 
-        public async Task<List<FishingNoteDto>> GetFishingNotesByUser(string user, CancellationToken ct)
+        public async Task<List<FishingNoteResponse>> GetFishingNotesByUserId(int userId, CancellationToken ct)
         {
-            var notes = await _fishingNoteRepository.GetFishingNotesByUserReadOnly(user, ct);
-
-            return _mapper.Map<List<FishingNoteDto>>(notes);
-        }
-
-        public async Task<List<FishingNoteResponse>> GetFishingNotesByUserV2(string user, CancellationToken ct)
-        {
-            var notes = await _fishingNoteRepository.GetFishingNotesByUserReadOnly(user, ct);
+            var notes = await _fishingNoteRepository.GetFishingNotesByUserIdReadOnly(userId, ct);
 
             return _mapper.Map<List<FishingNoteResponse>>(notes);
         }
 
-        public async Task<FishingNoteDto> CreateFishingNote(FishingNoteDto noteDto, CancellationToken ct)
-        {
-            if (noteDto.Coordinates != null)
-            {
-                var forecastTime = noteDto.StartTime.AddHours(
-                    (noteDto.EndTime - noteDto.StartTime).TotalHours / 2);
-                var forecast = await _weatherForecastClient.GetHourWeatherForecast(
-                (double)noteDto.Coordinates.Latitude,
-                (double)noteDto.Coordinates.Longitude,
-                forecastTime,
-                ct);
-
-                if (forecast != null)
-                {
-                    noteDto.Temp = forecast.Temp;
-                    noteDto.WindKph = forecast.WindKph;
-                    noteDto.WindDir = forecast.WindDir;
-                    noteDto.CloudPct = forecast.CloudPct;
-                    noteDto.ConditionText = forecast.Condition?.Text;
-                }
-            }
-
-            var note = _mapper.Map<FishingNote>(noteDto);
-
-            await _fishingNoteRepository.CreateFishingNote(note, ct);
-
-            return noteDto;
-        }
-
-        public async Task<FishingNoteResponse> CreateFishingNoteV2(
+        public async Task<FishingNoteResponse> CreateFishingNote(
             FishingNoteRequest noteRequest,
             CancellationToken ct)
         {
@@ -159,21 +109,7 @@ namespace Rybalka.Core.Services
             return true;
         }
 
-        public async Task<bool> UpdateFishingNote(FishingNoteDto noteDto, CancellationToken ct)
-        {
-            var note = await _fishingNoteRepository.GetFishingNoteById(noteDto.Id, ct);
-            if (note == null)
-            {
-                return false;
-            }
-
-            _mapper.Map(noteDto, note);
-            await _fishingNoteRepository.UpdateFishingNote(note, ct);
-
-            return true;
-        }
-
-        public async Task<bool> UpdateFishingNoteV2(
+        public async Task<bool> UpdateFishingNote(
             FishingNoteRequest noteRequest,
             int id,
             CancellationToken ct)

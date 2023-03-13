@@ -6,10 +6,7 @@ namespace Rybalka.Core.Dto.FishingNote
 {
     public sealed class FishingNoteRequest
     {
-        [MaxLength(15)]
-        [MinLength(4)]
-        public required string User { get; set; }
-
+        public required int UserId { get; set; }
         public string? Title { get; set; }
 
         public required DateTime StartTime { get; set; }

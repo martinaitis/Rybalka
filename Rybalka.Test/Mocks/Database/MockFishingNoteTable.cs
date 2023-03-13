@@ -10,7 +10,6 @@ namespace Rybalka.Test.Mocks.Database
             new FishingNote
             {
                 Id = 1,
-                Username = "Karolis",
                 Title = "Pavadinimas",
                 StartTime = new DateTime(2023, 2, 20, 10, 0, 0),
                 EndTime = new DateTime(2023, 2, 20, 12, 0, 0),
@@ -26,12 +25,18 @@ namespace Rybalka.Test.Mocks.Database
                 WindDir = "N",
                 CloudPct = 10,
                 ConditionText = "Sunny",
-                ImageFileName = "https://sheikasop-001-site1.atempurl.com/images/test.jpg"
+                ImageFileName = "https://sheikasop-001-site1.atempurl.com/images/test.jpg",
+                User = new User
+                {
+                    Id = 1,
+                    Username = "Karolis",
+                    Password = "string",
+                    PasswordHash = "string"
+                }
             },
             new FishingNote
             {
                 Id = 2,
-                Username = "Paulius",
                 Title = "Pavadinimas2",
                 StartTime = new DateTime(2023, 1, 20, 10, 0, 0),
                 EndTime = new DateTime(2023, 1, 20, 12, 0, 0),
@@ -47,7 +52,14 @@ namespace Rybalka.Test.Mocks.Database
                 WindDir = "S",
                 CloudPct = 80,
                 ConditionText = "Cloudy",
-                ImageFileName = "https://sheikasop-001-site1.atempurl.com/images/test2.jpg"
+                ImageFileName = "https://sheikasop-001-site1.atempurl.com/images/test2.jpg",
+                User = new User
+                {
+                    Id = 2,
+                    Username = "Paulius",
+                    Password = "string",
+                    PasswordHash = "string"
+                }
             }
         };
     }

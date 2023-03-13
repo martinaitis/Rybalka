@@ -70,12 +70,11 @@ namespace Rybalka.Test.TestRepositories
             var fishingNoteRepository = new FishingNoteRepository(_dbFixture.ApplicationDbContext);
 
             var result = await fishingNoteRepository
-                .GetFishingNotesByUserReadOnly("Karolis", CancellationToken.None);
+                .GetFishingNotesByUserIdReadOnly(1, CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.NotEmpty(result);
             Assert.Single(result);
-            Assert.True(result.All(n => n.Username == "Karolis"));
         }
 
         [Fact]
@@ -84,7 +83,7 @@ namespace Rybalka.Test.TestRepositories
             var fishingNoteRepository = new FishingNoteRepository(_dbFixture.ApplicationDbContext);
 
             var result = await fishingNoteRepository
-                .GetFishingNotesByUserReadOnly("NeraTokioUser", CancellationToken.None);
+                .GetFishingNotesByUserIdReadOnly(99, CancellationToken.None);
 
             Assert.NotNull(result);
             Assert.Empty(result);
